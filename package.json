@@ -1,0 +1,20 @@
+{
+  "name": "d2ao-react",
+  "version": "1.0.0",
+  "description": "Destiny 2 Armor Optimizer in React Js",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "destiny",
+    "express",
+    "javascript"
+  ],
+  "author": "John Barhorst",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
