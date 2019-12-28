@@ -27,18 +27,16 @@ const Ul = styled.ul`
 export default class Navigation extends Component {
   render() {
     return (
-      <Router>
-        <>
-          <nav>
-            <Ul>
-              <Li><Link to='/'>Destiny 2 Armor Optimizer</Link></Li>
-              <Li>Loadouts</Li>
-              <Li>Profile</Li>
-              <Li>Login</Li>
-            </Ul>
-          </nav>
-        </>
-      </Router>
+      <>
+        <nav>
+          <Ul>
+            <Li><Link to='/'>Destiny 2 Armor Optimizer</Link></Li>
+            <Li><Link to='/loadouts'>Loadouts</Link></Li>
+            <Li><Link to='/profile'>Profile</Link></Li>
+            <Li><Link to='/login'>Login</Link></Li>
+          </Ul>
+        </nav>
+      </>
     )
   }
 }

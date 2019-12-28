@@ -1,16 +1,40 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 import Navigation from './Components/Navigation';
+import Loadouts from './Components/Loadouts';
+import Login from './Components/Login';
+import Home from './Components/Home';
+import Profile from './Components/Profile';
 import './App.css';
 
 
 function App() {
   return (
-    <div className="App">
-      <Navigation />
-      <header className="App-header">
-        <h1>D2A0</h1>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Navigation />
+        <Switch>
+
+          <Route path='/loadouts'>
+            <Loadouts />
+          </Route>
+          <Route path='/profile'>
+            <Profile />
+          </Route>
+          <Route path='/login'>
+            <Login />
+          </Route>
+          <Route path='/'>
+            <Home />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
