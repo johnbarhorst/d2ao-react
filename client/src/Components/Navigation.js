@@ -1,25 +1,33 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
+
+
 const Li = styled.li`
+  margin: 0 5px;
+  &:first-child {
+    margin-right: auto;
+  }
 `;
 
 const Ul = styled.ul`
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-end;
+  align-content: center;
   list-style: none;
+  padding: 0 10px;
 `;
 
-export default class Nav extends Component {
+export default class Navigation extends Component {
   render() {
     return (
       <>
         <nav>
-          <h3>Destiny 2 Armor Optimizer</h3>
           <Ul>
-            <li>Loadouts</li>
-            <li>Profile</li>
-            <li>Login</li>
+            <Li>Destiny 2 Armor Optimizer</Li>
+            <Li>Loadouts</Li>
+            <Li>Profile</Li>
+            <Li>Login</Li>
           </Ul>
         </nav>
       </>
