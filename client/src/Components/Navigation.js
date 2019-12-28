@@ -1,4 +1,10 @@
 import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 import styled from 'styled-components';
 
 
@@ -21,16 +27,18 @@ const Ul = styled.ul`
 export default class Navigation extends Component {
   render() {
     return (
-      <>
-        <nav>
-          <Ul>
-            <Li>Destiny 2 Armor Optimizer</Li>
-            <Li>Loadouts</Li>
-            <Li>Profile</Li>
-            <Li>Login</Li>
-          </Ul>
-        </nav>
-      </>
+      <Router>
+        <>
+          <nav>
+            <Ul>
+              <Li><Link to='/'>Destiny 2 Armor Optimizer</Link></Li>
+              <Li>Loadouts</Li>
+              <Li>Profile</Li>
+              <Li>Login</Li>
+            </Ul>
+          </nav>
+        </>
+      </Router>
     )
   }
 }
