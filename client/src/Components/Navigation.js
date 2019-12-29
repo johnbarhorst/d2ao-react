@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from 'styled-components';
 
 
@@ -30,6 +25,7 @@ export default class Navigation extends Component {
       <>
         <nav>
           <Ul>
+            {/* TODO: NavLink */}
             <Li><Link to='/'>Destiny 2 Armor Optimizer</Link></Li>
             <Li><Link to='/loadouts'>Loadouts</Link></Li>
             <Li><Link to='/profile'>Profile</Link></Li>

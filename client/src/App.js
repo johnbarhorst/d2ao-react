@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
 } from "react-router-dom";
 import Navigation from './Components/Navigation';
 import Loadouts from './Components/Loadouts';
@@ -19,7 +18,6 @@ function App() {
       <div className="App">
         <Navigation />
         <Switch>
-
           <Route path='/loadouts'>
             <Loadouts />
           </Route>
