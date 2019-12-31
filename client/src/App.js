@@ -1,15 +1,10 @@
 import React from 'react';
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
+  BrowserRouter as Router
 } from "react-router-dom";
 import Navigation from './Components/Navigation';
-import Loadouts from './Components/Loadouts';
-import Login from './Components/Login';
-import Home from './Components/Home';
-import Profile from './Components/Profile';
-import './App.css';
+import RouteManager from './Components/RouteManager';
+import './global.css';
 
 
 function App() {
@@ -17,20 +12,7 @@ function App() {
     <Router>
       <div className="App">
         <Navigation />
-        <Switch>
-          <Route path='/loadouts'>
-            <Loadouts />
-          </Route>
-          <Route path='/profile'>
-            <Profile />
-          </Route>
-          <Route path='/login'>
-            <Login />
-          </Route>
-          <Route path='/'>
-            <Home />
-          </Route>
-        </Switch>
+        <RouteManager />
       </div>
     </Router>
   );
