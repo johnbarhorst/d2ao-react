@@ -1,11 +1,23 @@
-import React, { Component } from 'react'
+import React, { useContext } from 'react';
+import { UserContext } from '../App';
 
-export default class Profile extends Component {
-  render() {
+
+const Profile = () => {
+  const UserInfo = useContext(UserContext);
+
+  if (UserInfo.user) {
     return (
       <>
         <h3>Profile</h3>
       </>
     )
   }
+  return (
+    <>
+      <h3>You must log in first.</h3>
+    </>
+  )
 }
+
+
+export default Profile;
