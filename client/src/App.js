@@ -1,21 +1,20 @@
-import React, { createContext } from 'react';
+import React from 'react';
 import {
   BrowserRouter as Router
 } from "react-router-dom";
+import UserContext from './UserContext';
 import Navigation from './Components/Navigation';
 import RouteManager from './Components/RouteManager';
 import './global.css';
 
-export const UserContext = createContext();
+
 
 
 const App = () => {
   return (
-    <UserContext.Provider
-      value={{
-        user: true
-      }}
-    >
+    <UserContext.Provider value={{
+      user: false
+    }}>
       <Router>
         <div className="App">
           <Navigation />

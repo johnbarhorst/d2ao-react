@@ -4,9 +4,8 @@ const Oauth2Strategy = require('passport-oauth2');
 const rp = require('request-promise-native');
 require('dotenv').config();
 const { client_id, client_secret, API_KEY } = process.env;
-const ROOT_PATH = process.env || 'http://localhost:3000';
+const ROOT_PATH = process.env.ROOT_PATH || 'http://localhost:3000';
 const User = require('../models/user-models.js');
-const fs = require('fs');
 
 
 //cookies
@@ -42,6 +41,7 @@ passport.use(new Oauth2Strategy({
   User.findOne({ bungieId: bungieProfile.membershipId })
     .then(currentUser => {
       if (currentUser) {
+        console.log('Existing User Logged In');
         console.log(currentUser);
         done(null, currentUser);
       } else {
@@ -59,6 +59,7 @@ passport.use(new Oauth2Strategy({
             }
           })
         }).save().then(newUser => {
+          console.log('Created New User');
           console.log(newUser);
           done(null, newUser);
         });
@@ -72,7 +73,7 @@ router.get('/login', passport.authenticate('oauth2'));
 router.get('/logout', (req, res) => {
   // Handle logout with passport
   req.logout();
-  res.send('logged out');
+  res.redirect(`${ROOT_PATH}/`);
 });
 
 router.get('/failure', (req, res) => {
@@ -89,10 +90,10 @@ router.get('/redirect', passport.authenticate('oauth2', {}),
       console.log('logged in');
     }
     // Successful authentication, redirect home.
-    const reqKeys = Array.from(Object.keys(req));
-    console.log(reqKeys);
+    // const reqKeys = Array.from(Object.keys(req));
+    // console.log(reqKeys);
     console.log(req.query.code);
-    res.redirect('/');
+    res.redirect(`${ROOT_PATH}/`);
   });
 
 
