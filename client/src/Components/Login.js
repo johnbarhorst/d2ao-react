@@ -1,11 +1,16 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react';
 
-export default class Login extends Component {
-  render() {
-    return (
-      <>
-        <h3>Login</h3>
-      </>
-    )
-  }
+const tryLogin = async () => {
+  window.open('https://localhost:3001/auth/login');
 }
+
+const Login = () => {
+  return (
+    <>
+      <h3>Login</h3>
+      <button onClick={() => tryLogin()} >Login</button>
+    </>
+  )
+}
+
+export default Login;

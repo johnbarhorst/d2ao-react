@@ -2,6 +2,7 @@ const express = require('express');
 const https = require('https');
 const fs = require('fs');
 const rp = require('request-promise-native');
+const path = require('path');
 const cookieSession = require('cookie-session');
 const mongoose = require('mongoose');
 const passport = require('passport');
@@ -11,13 +12,6 @@ const { PORT } = process.env || 3001;
 const { API_KEY, Mongo_DB, cookieKey } = process.env;
 
 const app = express();
-const mongoOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-};
-
-// Connect to MongoDB
-mongoose.connect(Mongo_DB, mongoOptions, () => console.log('Connected to MongoDB'));
 
 const serverListenTime = function () {
   const today = new Date();
@@ -25,16 +19,36 @@ const serverListenTime = function () {
   return time;
 }
 
+
+// Connect to MongoDB
+const mongoOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+};
+mongoose.connect(Mongo_DB, mongoOptions, () => console.log('Connected to MongoDB'));
+
+//Middleware
+const authCheck = (req, res, next) => {
+  if (!req.user) {
+    res.status(401).json({
+      authenticated: false,
+      message: "user has not been authenticated"
+    });
+  } else {
+    next();
+  }
+};
+
+app.use(cookieSession({
+  maxAge: 24 * 60 * 60 * 1000,
+  keys: [process.env.cookieKey],
+}));
+
 // Routing
 const authRoutes = require('./routes/auth.js');
 const apiRoutes = require('./routes/api.js');
 
 
-//Middleware
-app.use(cookieSession({
-  maxAge: 24 * 60 * 60 * 1000,
-  keys: [process.env.cookieKey],
-}));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -49,10 +63,12 @@ app.use(function (err, req, res, next) {
   res.status(404).send("Sorry can't find that!");
 });
 
+app.use(express.static(path.join(__dirname, '/client/build')));
 
 app.get('/', (req, res, next) => {
-  res.send('Hello World');
+  res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
+
 
 https.createServer({
   key: fs.readFileSync('server.key'),

@@ -4,7 +4,9 @@ const Oauth2Strategy = require('passport-oauth2');
 const rp = require('request-promise-native');
 require('dotenv').config();
 const { client_id, client_secret, API_KEY } = process.env;
+const ROOT_PATH = process.env || 'http://localhost:3000';
 const User = require('../models/user-models.js');
+const fs = require('fs');
 
 
 //cookies
@@ -69,7 +71,8 @@ router.get('/login', passport.authenticate('oauth2'));
 
 router.get('/logout', (req, res) => {
   // Handle logout with passport
-  res.send('Bungie Logout stuff to come');
+  req.logout();
+  res.send('logged out');
 });
 
 router.get('/failure', (req, res) => {
@@ -82,9 +85,14 @@ router.get('/success', (req, res) => {
 
 router.get('/redirect', passport.authenticate('oauth2', {}),
   (req, res) => {
-    console.log('logged in');
+    if (req.user) {
+      console.log('logged in');
+    }
     // Successful authentication, redirect home.
-    res.send(req.user);
+    const reqKeys = Array.from(Object.keys(req));
+    console.log(reqKeys);
+    console.log(req.query.code);
+    res.redirect('/');
   });
 
 
