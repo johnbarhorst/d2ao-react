@@ -10,9 +10,11 @@ router.get('/Profile/getCurrentUser', async (req, res, next) => {
   keys(req);
   console.log(req.cookies);
   keys(req.signedCookies);
-  keys(req.session.passport.user);
   console.log(req.session.userId);
-  res.send(user);
+  res.send({
+    loggedIn: req.session.user,
+    userId: req.session.userId
+  });
 });
 
 // Handle Item Instance Requests 

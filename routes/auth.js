@@ -28,7 +28,7 @@ passport.deserializeUser((id, done) => {
 router.use('/', (req, res, next) => {
   keys(req);
   keys(req.query);
-  console.log(req.query.code);
+  console.log('Code:', req.query.code);
 
   next();
 });
@@ -82,6 +82,9 @@ router.get('/login', passport.authenticate('oauth2'));
 
 router.get('/logout', (req, res) => {
   // Handle logout with passport
+  console.log('logged out');
+  req.session.user = false;
+  req.session.userId = null;
   req.logout();
   res.redirect(ROOT_PATH);
 });

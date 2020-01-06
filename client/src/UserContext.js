@@ -7,7 +7,8 @@ export const User = {
   user: null,
   getUserData: async () => {
     const data = await fetch(`/api/Profile/getCurrentUser`);
-    console.log(data);
+    const response = await data.json();
+    console.log(response);
   }
 }
 
