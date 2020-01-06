@@ -2,10 +2,23 @@ const router = require('express').Router();
 let ROOT_PATH;
 process.env.DEV_MODE ? ROOT_PATH = 'https://localhost:3000/' : ROOT_PATH = '/';
 
+//Helpful little debugging function
 const keys = (object) => console.log(Array.from(Object.keys(object)));
 
+//Middleware
+const authCheck = (req, res, next) => {
+  if (!req.user) {
+    res.status(401).json({
+      loggedIn: false,
+      message: "user has not been authenticated"
+    });
+  } else {
+    next();
+  }
+};
+
 // Get Current User Data
-router.get('/Profile/getCurrentUser', async (req, res, next) => {
+router.get('/Profile/getCurrentUser', authCheck, async (req, res, next) => {
   console.log('Getting Current User Data');
   const { loggedIn, userId, userProfile } = req.session;
   keys(req.session);
