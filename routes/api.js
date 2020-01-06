@@ -1,4 +1,19 @@
 const router = require('express').Router();
+let ROOT_PATH;
+process.env.DEV_MODE ? ROOT_PATH = 'https://localhost:3000/' : ROOT_PATH = '/';
+
+const keys = (object) => console.log(Array.from(Object.keys(object)));
+
+// Get Current User Data
+router.get('/Profile/getCurrentUser', async (req, res, next) => {
+  console.log('Getting Current User Data');
+  keys(req);
+  console.log(req.cookies);
+  keys(req.signedCookies);
+  keys(req.session.passport.user);
+  console.log(req.session.userId);
+  res.send(user);
+});
 
 // Handle Item Instance Requests 
 router.get('/Item/:membershipType/:destinyMembershipId/:itemInstanceId', async (req, res, next) => {
@@ -31,8 +46,7 @@ router.get('/Profile/:membershipType/:destinyMembershipId', async (req, res, nex
   res.send(data);
 });
 
-//Handle Individual Character Request
-
+// Handle Individual Character Request
 router.get('/Profile/:membershipType/:destinyMembershipId/:characterId', async (req, res, next) => {
   console.log('Character Request');
   const data = await rp({

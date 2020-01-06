@@ -4,12 +4,17 @@ const Oauth2Strategy = require('passport-oauth2');
 const rp = require('request-promise-native');
 require('dotenv').config();
 const { client_id, client_secret, API_KEY } = process.env;
-const ROOT_PATH = process.env.ROOT_PATH || 'http://localhost:3000';
 const User = require('../models/user-models.js');
+let ROOT_PATH;
+process.env.DEV_MODE ? ROOT_PATH = 'https://localhost:3000/' : ROOT_PATH = '/';
+
+const keys = (object) => console.log(Array.from(Object.keys(object)));
+
 
 
 //cookies
 passport.serializeUser((user, done) => {
+  console.log('serialized');
   done(null, user.id);
 });
 
@@ -17,6 +22,15 @@ passport.deserializeUser((id, done) => {
   User.findById(id).then((user) => {
     done(null, user);
   })
+});
+
+
+router.use('/', (req, res, next) => {
+  keys(req);
+  keys(req.query);
+  console.log(req.query.code);
+
+  next();
 });
 
 //auth login
@@ -41,8 +55,6 @@ passport.use(new Oauth2Strategy({
   User.findOne({ bungieId: bungieProfile.membershipId })
     .then(currentUser => {
       if (currentUser) {
-        console.log('Existing User Logged In');
-        console.log(currentUser);
         done(null, currentUser);
       } else {
         new User({
@@ -59,8 +71,6 @@ passport.use(new Oauth2Strategy({
             }
           })
         }).save().then(newUser => {
-          console.log('Created New User');
-          console.log(newUser);
           done(null, newUser);
         });
       }
@@ -73,29 +83,16 @@ router.get('/login', passport.authenticate('oauth2'));
 router.get('/logout', (req, res) => {
   // Handle logout with passport
   req.logout();
-  res.redirect(`${ROOT_PATH}/`);
+  res.redirect(ROOT_PATH);
 });
 
-router.get('/failure', (req, res) => {
-  res.send('Failure');
+router.get('/redirect', passport.authenticate('oauth2'), (req, res) => {
+  console.log('redirect');
+  req.session.userId = req.session.passport.user;
+  req.session.user = true;
+  console.log('after');
+  keys(req.session);
+  res.redirect(ROOT_PATH);
 });
-
-router.get('/success', (req, res) => {
-  res.send('Success');
-});
-
-router.get('/redirect', passport.authenticate('oauth2', {}),
-  (req, res) => {
-    if (req.user) {
-      console.log('logged in');
-    }
-    // Successful authentication, redirect home.
-    // const reqKeys = Array.from(Object.keys(req));
-    // console.log(reqKeys);
-    console.log(req.query.code);
-    res.redirect(`${ROOT_PATH}/`);
-  });
-
-
 
 module.exports = router;

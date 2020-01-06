@@ -4,14 +4,14 @@ const Schema = mongoose.Schema;
 const platformSchema = new Schema({
   displayName: String,
   membershipType: Number,
-  membershipId: Number,
+  membershipId: String,
   crossSaveOverride: Number,
   iconPath: String
 })
 
 const userSchema = new Schema({
   username: String,
-  bungieId: Number,
+  bungieId: String,
   locale: String,
   platforms: [platformSchema]
 });

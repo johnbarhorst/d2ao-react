@@ -2,10 +2,13 @@ const express = require('express');
 const https = require('https');
 const fs = require('fs');
 const rp = require('request-promise-native');
+const cors = require('cors');
 const path = require('path');
 const cookieSession = require('cookie-session');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const User = require('./models/user-models');
 require('dotenv').config();
 
 const { PORT } = process.env || 3001;
@@ -44,14 +47,22 @@ app.use(cookieSession({
   keys: [process.env.cookieKey],
 }));
 
+app.use(cookieParser());
 // Routing
 const authRoutes = require('./routes/auth.js');
 const apiRoutes = require('./routes/api.js');
 
-
-
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(
+  cors({
+    origin: "http://localhost:3000", // allow to server to accept request from different origin
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true // allow session cookie from browser to pass through
+  })
+);
+
 
 // OAuth Handling
 app.use('/auth', authRoutes);
