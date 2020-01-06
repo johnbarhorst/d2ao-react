@@ -83,18 +83,21 @@ router.get('/login', passport.authenticate('oauth2'));
 router.get('/logout', (req, res) => {
   // Handle logout with passport
   console.log('logged out');
-  req.session.user = false;
+  req.session.loggedIn = false;
   req.session.userId = null;
+  req.session.userProfile = null;
   req.logout();
   res.redirect(ROOT_PATH);
 });
 
 router.get('/redirect', passport.authenticate('oauth2'), (req, res) => {
   console.log('redirect');
+  keys(req);
+  console.log('user:', req.user);
   req.session.userId = req.session.passport.user;
-  req.session.user = true;
+  req.session.loggedIn = true;
+  req.session.userProfile = req.user;
   console.log('after');
-  keys(req.session);
   res.redirect(ROOT_PATH);
 });
 

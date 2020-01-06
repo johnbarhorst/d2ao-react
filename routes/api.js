@@ -7,13 +7,13 @@ const keys = (object) => console.log(Array.from(Object.keys(object)));
 // Get Current User Data
 router.get('/Profile/getCurrentUser', async (req, res, next) => {
   console.log('Getting Current User Data');
-  keys(req);
-  console.log(req.cookies);
-  keys(req.signedCookies);
-  console.log(req.session.userId);
+  const { loggedIn, userId, userProfile } = req.session;
+  keys(req.session);
+  console.log('Session');
   res.send({
-    loggedIn: req.session.user,
-    userId: req.session.userId
+    loggedIn,
+    userId,
+    userProfile
   });
 });
 
