@@ -9,7 +9,7 @@ const keys = (object) => console.log(Array.from(Object.keys(object)));
 const authCheck = (req, res, next) => {
   if (!req.user) {
     res.status(401).json({
-      loggedIn: false,
+      isLoggedIn: false,
       message: "user has not been authenticated"
     });
   } else {
@@ -20,11 +20,11 @@ const authCheck = (req, res, next) => {
 // Get Current User Data
 router.get('/Profile/getCurrentUser', authCheck, async (req, res, next) => {
   console.log('Getting Current User Data');
-  const { loggedIn, userId, userProfile } = req.session;
+  const { isLoggedIn, userId, userProfile } = req.session;
   keys(req.session);
   console.log('Session');
   res.send({
-    loggedIn,
+    isLoggedIn,
     userId,
     userProfile
   });

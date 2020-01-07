@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { UserContext } from '../UserContext';
+import React, { useContext } from 'react';
+import { UserContext } from '../Context';
 
 const tryLogin = () => {
   window.open('https://localhost:3001/auth/login', '_self');
@@ -11,13 +11,13 @@ const tryLogout = () => {
 
 
 const Login = () => {
-  const UserInfo = useContext(UserContext);
+  const userInfo = useContext(UserContext);
   return (
     <>
       <h3>Login</h3>
       <button onClick={() => tryLogin()} >Login</button>
       <button onClick={() => tryLogout()} >Logout</button>
-      <button onClick={() => UserInfo.getUserData()} >Test</button>
+      <button onClick={() => userInfo.updateLoginStatus()} >Test</button>
     </>
   )
 }
