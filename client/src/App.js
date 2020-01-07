@@ -4,7 +4,7 @@ import {
 } from "react-router-dom";
 import Navigation from './Components/Navigation';
 import RouteManager from './Components/RouteManager';
-import { UserContext } from './Context';
+import { UserContext } from './Contexts';
 import './global.css';
 
 

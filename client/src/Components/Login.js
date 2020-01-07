@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { UserContext } from '../Context';
+import { UserContext } from '../Contexts';
 
 const tryLogin = () => {
   window.open('https://localhost:3001/auth/login', '_self');
