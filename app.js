@@ -34,7 +34,7 @@ mongoose.connect(Mongo_DB, mongoOptions, () => console.log('Connected to MongoDB
 const authCheck = (req, res, next) => {
   if (!req.user) {
     res.status(401).json({
-      authenticated: false,
+      isLoggedIn: false,
       message: "user has not been authenticated"
     });
   } else {

@@ -4,11 +4,13 @@ import { UserContext } from '../Contexts';
 
 const Profile = () => {
   const UserInfo = useContext(UserContext);
+  const { isLoggedIn, userProfile, platforms } = UserInfo;
 
-  if (UserInfo.user) {
+  if (isLoggedIn) {
     return (
       <>
-        <h3>Profile</h3>
+
+        <h3>{userProfile.username}</h3>
       </>
     )
   }
