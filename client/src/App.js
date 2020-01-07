@@ -1,20 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BrowserRouter as Router
 } from "react-router-dom";
-import { UserContext, User } from './UserContext';
 import Navigation from './Components/Navigation';
 import RouteManager from './Components/RouteManager';
+import { UserContext } from './Context';
 import './global.css';
 
 
 
-
 const App = () => {
-  const [user, setUser] = useState(User);
-  console.log(user);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userProfile, setUserProfile] = useState({});
+  const [platforms, setPlatforms] = useState([]);
+
+  const updateUserProfile = async () => {
+    const data = await fetch(`/api/Profile/GetCurrentUser`);
+    const res = await data.json();
+    const { isLoggedIn, userProfile } = await res;
+    setIsLoggedIn(isLoggedIn);
+    if (res.isLoggedIn) {
+      setUserProfile({ userProfile });
+      setPlatforms([...userProfile.platforms]);
+    }
+  }
+
+  useEffect(() => {
+    updateUserProfile();
+  }, []);
+
   return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={{ isLoggedIn, userProfile, platforms }}>
       <Router>
         <div className="App">
           <Navigation />
