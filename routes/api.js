@@ -8,6 +8,12 @@ process.env.DEV_MODE ? ROOT_PATH = 'https://localhost:3000/' : ROOT_PATH = '/';
 //Helpful little debugging function
 const keys = (object) => console.log(Array.from(Object.keys(object)));
 
+
+// Trim Response off the response from Bungie, then convert back to string to send.
+const trimResponse = (data) => {
+  return JSON.stringify(JSON.parse(data).Response);
+}
+
 //Middleware
 const authCheck = (req, res, next) => {
   if (!req.user) {
@@ -41,10 +47,18 @@ router.get('/Item/:membershipType/:destinyMembershipId/:itemInstanceId', async (
     headers: {
       "X-API-KEY": API_KEY
     }
-  }, (err, res, body) => {
-    if (err) { return console.log(err); }
+  }).catch((err, res, body) => {
+    if (err) {
+      console.log(body);
+      console.log(keys(err));
+      console.log(err.options);
+      err.send(err.response.body);
+    }
   });
-  console.log(JSON.parse(data).Response);
+
+  const dataToSend = JSON.stringify(JSON.parse(data).Response);
+  console.log(dataToSend);
+  console.log(data);
   res.send(data);
 });
 
@@ -64,8 +78,8 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
       err.send(err.response.body);
     }
   });
-  console.log(JSON.parse(data).Response);
-  res.send(data);
+  const dataToSend = trimResponse(data);
+  res.send(dataToSend);
 });
 
 // Handle Individual Character Request
@@ -76,8 +90,13 @@ router.get('/Characters/:membershipType/:destinyMembershipId/:characterId', asyn
     headers: {
       "X-API-KEY": API_KEY
     }
-  }, (err, res, body) => {
-    if (err) { return console.log(err); }
+  }).catch((err, res, body) => {
+    if (err) {
+      console.log(body);
+      console.log(keys(err));
+      console.log(err.options);
+      err.send(err.response.body);
+    }
   });
   console.log(JSON.parse(data).Response);
   res.send(data);

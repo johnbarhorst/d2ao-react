@@ -20,7 +20,7 @@ const App = () => {
     const res = await data.json();
     const { isLoggedIn, userProfile } = await res;
     setIsLoggedIn(isLoggedIn);
-    if (res.isLoggedIn) {
+    if (userProfile) {
       setUserProfile({ ...userProfile });
       setPlatforms([...userProfile.platforms]);
       getGuardians([...userProfile.platforms]);
@@ -32,7 +32,7 @@ const App = () => {
       const data = platforms.map(async char => {
         const characters = await fetch(`api/GetCharacterList/${char.membershipType}/${char.membershipId}`);
         const json = await characters.json();
-        return Array.from(Object.values(json.Response.characters.data));
+        return Array.from(Object.values(json.characters.data));
       })
       const guardianList = await Promise.all(data);
       return setGuardians(...guardianList);
