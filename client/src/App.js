@@ -5,6 +5,7 @@ import {
 import Navigation from './Components/Navigation';
 import RouteManager from './Components/RouteManager';
 import { UserContext } from './Contexts';
+import 'normalize.css';
 import './global.css';
 
 

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useOnClickOutside = (ref, handler) => {
   // Put a ref={el} on the element
@@ -19,4 +19,14 @@ export const useOnClickOutside = (ref, handler) => {
       document.removeEventListener('touchstart', listener);
     }
   }, [])
+}
+
+// Todo: Doesn't update after api call
+export const useSetPageTitle = title => {
+  const [pageTitle, setPageTitle] = useState(document.title);
+  const updateTitle = newTitle => newTitle ? document.title = `D2AO: ${newTitle}` : document.title = `D2AO`;
+  useEffect(() => {
+    setPageTitle(title);
+    updateTitle(pageTitle);
+  }, [pageTitle]);
 }

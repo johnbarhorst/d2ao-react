@@ -1,11 +1,13 @@
 import React, { useContext } from 'react';
 import { UserContext } from '../Contexts';
+import { useSetPageTitle } from '../Hooks';
 import EmblemCard from './EmblemCard';
 
 
 const Profile = () => {
   const UserInfo = useContext(UserContext);
   const { isLoggedIn, userProfile, guardians } = UserInfo;
+  useSetPageTitle(userProfile.username);
 
   if (isLoggedIn) {
     return (
