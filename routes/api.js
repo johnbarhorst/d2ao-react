@@ -26,6 +26,7 @@ const authCheck = (req, res, next) => {
   }
 };
 
+
 // Get Current User Data
 router.get('/Profile/getCurrentUser', authCheck, async (req, res, next) => {
   console.log('Getting Current User Data');

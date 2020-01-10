@@ -10,7 +10,17 @@ process.env.DEV_MODE ? ROOT_PATH = 'https://localhost:3000/' : ROOT_PATH = '/';
 
 const keys = (object) => console.log(Array.from(Object.keys(object)));
 
-
+//Middleware
+const authCheck = (req, res, next) => {
+  if (!req.user) {
+    res.status(401).json({
+      isLoggedIn: false,
+      message: "user has not been authenticated"
+    });
+  } else {
+    next();
+  }
+};
 
 //cookies
 passport.serializeUser((user, done) => {
@@ -100,5 +110,10 @@ router.get('/redirect', passport.authenticate('oauth2'), (req, res) => {
   console.log('after');
   res.redirect(ROOT_PATH);
 });
+
+
+router.get('/checkAuth', authCheck, (req, res) => {
+  res.send(req.session.isLoggedIn);
+})
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Link } from 'react-router-dom';
 import { UserContext } from '../Contexts';
 import { useSetPageTitle } from '../Hooks';
 import EmblemCard from './EmblemCard';
@@ -18,7 +18,9 @@ const Profile = () => {
           <h3>{userProfile.username}</h3>
         </div>
         {guardians.map(guardian =>
-          <EmblemCard {...guardian} key={guardian.characterId} />
+          <Link to={`/profile/${guardian.characterId}`} key={guardian.characterId}>
+            <EmblemCard {...guardian} />
+          </Link>
         )}
         <div>
           <Switch>

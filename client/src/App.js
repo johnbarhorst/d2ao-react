@@ -16,16 +16,10 @@ const App = () => {
   const [platforms, setPlatforms] = useState([]);
   const [guardians, setGuardians] = useState([]);
 
-  const updateUserProfile = async () => {
-    const data = await fetch(`/api/Profile/GetCurrentUser`);
+  const checkLoginStatus = async () => {
+    const data = await fetch(`/auth/checkAuth`);
     const res = await data.json();
-    const { isLoggedIn, userProfile } = await res;
-    setIsLoggedIn(isLoggedIn);
-    if (userProfile) {
-      setUserProfile({ ...userProfile });
-      setPlatforms([...userProfile.platforms]);
-      getGuardians([...userProfile.platforms]);
-    }
+    setIsLoggedIn(res);
   }
 
   const getGuardians = async (platforms) => {
@@ -41,9 +35,25 @@ const App = () => {
     return setGuardians([]);
   }
 
+  const updateUserProfile = async () => {
+    const data = await fetch(`/api/Profile/GetCurrentUser`);
+    const res = await data.json();
+    const userProfile = await res.userProfile;
+    if (userProfile) {
+      setUserProfile({ ...userProfile });
+      setPlatforms([...userProfile.platforms]);
+      getGuardians([...userProfile.platforms]);
+    }
+  }
+
+  useEffect(() => {
+    checkLoginStatus();
+  });
+
   useEffect(() => {
     updateUserProfile();
-  }, []);
+  }, [isLoggedIn]);
+
 
   return (
     <UserContext.Provider value={{ isLoggedIn, userProfile, platforms, guardians }}>
