@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+
 
 const Card = styled.div`
   display: flex;
@@ -37,6 +39,7 @@ const raceTypeRef = ["Human", "Awoken", "Exo"];
 
 
 const EmblemCard = (props) => {
+
   return (
     <Card bgPath={props.emblemBackgroundPath}>
       <div className='class-race' >
