@@ -1,5 +1,4 @@
-import React, { useContext } from 'react';
-import { UserContext } from '../Contexts';
+import React from 'react';
 
 const tryLogin = () => {
   window.open('https://localhost:3001/auth/login', '_self');
@@ -11,7 +10,6 @@ const tryLogout = () => {
 
 
 const Login = () => {
-  const userInfo = useContext(UserContext);
   return (
     <>
       <h3>Login</h3>

@@ -18,7 +18,7 @@ export const useOnClickOutside = (ref, handler) => {
       document.removeEventListener('mousedown', listener);
       document.removeEventListener('touchstart', listener);
     }
-  }, [])
+  }, [ref, handler]);
 }
 
 // Todo: Doesn't update after api call
@@ -28,5 +28,5 @@ export const useSetPageTitle = title => {
   useEffect(() => {
     setPageTitle(title);
     updateTitle(pageTitle);
-  }, [pageTitle]);
+  }, [pageTitle, title]);
 }

@@ -29,7 +29,7 @@ const Profile = () => {
         <div>
           <Switch>
             <Route path={`/profile/:guardianId`}
-              render={value => <Guardian props={value.match.params} guardian={value.location.state.guardian} />}
+              render={value => <Guardian guardianInfo={value.location.state.guardian} />}
             />
           </Switch>
         </div>
