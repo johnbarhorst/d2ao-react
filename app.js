@@ -28,7 +28,11 @@ const mongoOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true
 };
-mongoose.connect(Mongo_DB, mongoOptions, () => console.log('Connected to MongoDB'));
+console.time('Mongo Connection');
+mongoose.connect(Mongo_DB, mongoOptions, () => {
+  console.log('Connected to MongoDB');
+  console.timeEnd('Mongo Connection');
+});
 
 //Middleware
 const authCheck = (req, res, next) => {

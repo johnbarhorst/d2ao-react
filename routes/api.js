@@ -84,7 +84,7 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
 });
 
 // Handle Individual Character Request
-router.get('/Characters/:membershipType/:destinyMembershipId/:characterId', async (req, res, next) => {
+router.get('/getCharacterData/:membershipType/:destinyMembershipId/:characterId', async (req, res, next) => {
   console.log('Character Request');
   const data = await rp({
     url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=201`,
@@ -100,6 +100,7 @@ router.get('/Characters/:membershipType/:destinyMembershipId/:characterId', asyn
     }
   });
   console.log(JSON.parse(data).Response);
+  const dataToSend = trimResponse(data);
   res.send(data);
 });
 

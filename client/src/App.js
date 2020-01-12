@@ -16,12 +16,6 @@ const App = () => {
   const [platforms, setPlatforms] = useState([]);
   const [guardians, setGuardians] = useState([]);
 
-  const checkLoginStatus = async () => {
-    const data = await fetch(`/auth/checkAuth`);
-    const res = await data.json();
-    setIsLoggedIn(res);
-  }
-
   const getGuardians = async (platforms) => {
     if (platforms.length > 0) {
       const data = platforms.map(async char => {
@@ -35,23 +29,32 @@ const App = () => {
     return setGuardians([]);
   }
 
-  const updateUserProfile = async () => {
-    const data = await fetch(`/api/Profile/GetCurrentUser`);
-    const res = await data.json();
-    const userProfile = await res.userProfile;
-    if (userProfile) {
-      setUserProfile({ ...userProfile });
-      setPlatforms([...userProfile.platforms]);
-      getGuardians([...userProfile.platforms]);
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const data = await fetch(`/auth/checkAuth`);
+      console.log(data);
+      const res = await data.json();
+      console.log(res);
+      setIsLoggedIn(res);
     }
-  }
-
-  useEffect(() => {
     checkLoginStatus();
-  });
+  }, []);
 
   useEffect(() => {
-    updateUserProfile();
+    const updateUserProfile = async () => {
+      console.log('Fetching Current User Info');
+      const data = await fetch(`/api/Profile/GetCurrentUser`);
+      const res = await data.json();
+      const userProfile = await res.userProfile;
+      if (userProfile) {
+        setUserProfile({ ...userProfile });
+        setPlatforms([...userProfile.platforms]);
+        getGuardians([...userProfile.platforms]);
+      }
+    }
+    if (isLoggedIn) {
+      updateUserProfile();
+    }
   }, [isLoggedIn]);
 
 

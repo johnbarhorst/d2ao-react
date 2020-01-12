@@ -52,6 +52,7 @@ passport.use(new Oauth2Strategy({
   clientSecret: client_secret,
   callBackURL: 'https://localhost:3001/auth/redirect'
 }, async (accessToken, refreshToken, profile, done) => {
+  console.log('Fetching Bungie Account data');
   const data = await rp({
     url: `https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/`,
     headers: {
@@ -59,11 +60,14 @@ passport.use(new Oauth2Strategy({
       "X-API-KEY": API_KEY
     }
   }, err => err && console.log(err));
+  console.log('Bungie account fetched, next step');
   const accountInfo = JSON.parse(data).Response;
   const destinyProfile = accountInfo.destinyMemberships;
   const bungieProfile = accountInfo.bungieNetUser;
+  console.log(accountInfo);
   User.findOne({ bungieId: bungieProfile.membershipId })
     .then(currentUser => {
+      console.log('In db user stuff');
       if (currentUser) {
         done(null, currentUser);
       } else {
@@ -85,7 +89,6 @@ passport.use(new Oauth2Strategy({
         });
       }
     });
-
 }));
 
 router.get('/login', passport.authenticate('oauth2'));
@@ -112,8 +115,12 @@ router.get('/redirect', passport.authenticate('oauth2'), (req, res) => {
 });
 
 
-router.get('/checkAuth', authCheck, (req, res) => {
-  res.send(req.session.isLoggedIn);
+router.get('/checkAuth', (req, res) => {
+  if (req.session.isLoggedIn) {
+    res.send(req.session.isLoggedIn);
+  } else {
+    res.send(false);
+  }
 })
 
 module.exports = router;

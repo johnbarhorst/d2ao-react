@@ -17,7 +17,6 @@ const Login = () => {
       <h3>Login</h3>
       <button onClick={() => tryLogin()} >Login</button>
       <button onClick={() => tryLogout()} >Logout</button>
-      <button onClick={() => userInfo.updateLoginStatus()} >Test</button>
     </>
   )
 }

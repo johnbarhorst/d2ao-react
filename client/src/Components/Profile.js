@@ -18,15 +18,19 @@ const Profile = () => {
           <h3>{userProfile.username}</h3>
         </div>
         {guardians.map(guardian =>
-          <Link to={`/profile/${guardian.characterId}`} key={guardian.characterId}>
+          <Link to={{
+            pathname: `/profile/${guardian.characterId}`,
+            state: { guardian }
+          }}
+            key={guardian.characterId}>
             <EmblemCard {...guardian} />
           </Link>
         )}
         <div>
           <Switch>
-            <Route path={`/profile/:guardianId`}>
-              <Guardian />
-            </Route>
+            <Route path={`/profile/:guardianId`}
+              render={value => <Guardian props={value.match.params} guardian={value.location.state.guardian} />}
+            />
           </Switch>
         </div>
         <div>

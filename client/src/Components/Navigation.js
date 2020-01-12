@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+import React, { useContext } from 'react';
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
+import { UserContext } from '../Contexts';
 
 
 
@@ -19,21 +20,25 @@ const Ul = styled.ul`
   padding: 0 10px;
 `;
 
-export default class Navigation extends Component {
-  render() {
-    return (
-      <>
-        <nav>
-          <Ul>
-            {/* TODO: NavLink */}
-            <Li><Link to='/'>Destiny 2 Armor Optimizer</Link></Li>
-            <Li><Link to='/loadouts'>Loadouts</Link></Li>
+const Navigation = () => {
+  const UserInfo = useContext(UserContext);
+  return (
+    <>
+      <nav>
+        <Ul>
+          {/* TODO: NavLink */}
+          <Li><Link to='/'>Destiny 2 Armor Optimizer</Link></Li>
+          <Li><Link to='/loadouts'>Loadouts</Link></Li>
+          {UserInfo.isLoggedIn ? (
             <Li><Link to='/profile'>Profile</Link></Li>
-            <Li><Link to='/login'>Login</Link></Li>
-          </Ul>
-        </nav>
-      </>
-    )
-  }
+          ) : (
+              <Li><Link to='/login'>Login</Link></Li>
+            )}
+        </Ul>
+      </nav>
+    </>
+  )
 }
+
+export default Navigation;
 
