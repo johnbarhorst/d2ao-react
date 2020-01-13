@@ -85,8 +85,6 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
 
 // Handle Individual Item Request 
 router.get('/getInstancedItemDetails/:membershipType/:destinyMembershipId/:itemInstanceId', async (req, res, next) => {
-  console.log('Item Details Request');
-  console.log(req.params);
   const data = await rp({
     url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${req.params.itemInstanceId}/?components=300,302`,
     headers: {
@@ -101,8 +99,6 @@ router.get('/getInstancedItemDetails/:membershipType/:destinyMembershipId/:itemI
     }
   });
   const dataToSend = trimResponse(data);
-  console.log(dataToSend);
-  console.log(typeof dataToSend);
   res.send(dataToSend);
 })
 

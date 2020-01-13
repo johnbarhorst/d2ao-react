@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import Item from './Item';
+
+const ItemDisplay = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 10px;
+`;
 
 
 const Guardian = ({ guardianInfo }) => {
@@ -23,15 +30,17 @@ const Guardian = ({ guardianInfo }) => {
   return (
     <div>
       <p>{classTypeRef[guardianInfo.classType]}</p>
-      {equipment.map(item =>
-        <Item
-          membershipType={membershipType}
-          membershipId={membershipId}
-          characterId={characterId}
-          itemData={item}
-          key={item.itemInstanceId}
-        />
-      )}
+      <ItemDisplay>
+        {equipment.map(item =>
+          <Item
+            membershipType={membershipType}
+            membershipId={membershipId}
+            characterId={characterId}
+            itemData={item}
+            key={item.itemInstanceId}
+          />
+        )}
+      </ItemDisplay>
     </div>
   )
 }
