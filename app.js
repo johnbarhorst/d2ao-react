@@ -11,6 +11,7 @@ const passport = require('passport');
 const User = require('./models/user-models');
 require('dotenv').config();
 
+
 const { PORT } = process.env || 3001;
 const { API_KEY, Mongo_DB, cookieKey } = process.env;
 
@@ -55,7 +56,9 @@ app.use(cookieParser());
 // Routing
 const authRoutes = require('./routes/auth.js');
 const apiRoutes = require('./routes/api.js');
+const databaseRoutes = require('./routes/database.js');
 
+// OAuth Handling
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -67,8 +70,8 @@ app.use(
   })
 );
 
-
-// OAuth Handling
+//Router init
+app.use('/database', databaseRoutes);
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 
@@ -77,6 +80,8 @@ app.use(function (err, req, res, next) {
   console.error(err.stack);
   res.status(404).send("Sorry can't find that!");
 });
+
+
 
 app.use(express.static(path.join(__dirname, '/client/build')));
 

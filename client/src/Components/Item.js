@@ -13,22 +13,27 @@ const Item = ({ membershipType, membershipId, itemData }) => {
   const [itemPerks, setItemPerks] = useState([]);
   const { itemInstanceId } = itemData;
 
-  const getItemDetails = async () => {
-    const data = await fetch(`/api/getInstancedItemDetails/${membershipType}/${membershipId}/${itemInstanceId}`);
-    const res = await data.json();
-    console.log(res);
-    setItem(res.instance.data);
-    if (res.perks.data) {
-      setItemPerks(res.perks.data.perks);
-    }
+  const searchDB = async () => {
+    const data = await fetch(`/database/GetItemDetails/${itemData.itemHash}`);
+    const itemDetails = await data.json();
+    console.log(itemDetails);
   }
 
   useEffect(() => {
+    const getItemDetails = async () => {
+      const data = await fetch(`/api/getInstancedItemDetails/${membershipType}/${membershipId}/${itemInstanceId}`);
+      const res = await data.json();
+      console.log(res);
+      setItem(res.instance.data);
+      if (res.perks.data) {
+        setItemPerks(res.perks.data.perks);
+      }
+    }
     getItemDetails();
 
-  }, [itemInstanceId]);
+  }, [itemInstanceId, membershipId, membershipType]);
   return (
-    <ItemCard>
+    <ItemCard onClick={() => searchDB()}>
       <p>{itemInstanceId}</p>
     </ItemCard>
   )
