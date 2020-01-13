@@ -83,6 +83,29 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
   res.send(dataToSend);
 });
 
+// Handle Individual Item Request 
+router.get('/getInstancedItemDetails/:membershipType/:destinyMembershipId/:itemInstanceId', async (req, res, next) => {
+  console.log('Item Details Request');
+  console.log(req.params);
+  const data = await rp({
+    url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${req.params.itemInstanceId}/?components=300,302`,
+    headers: {
+      "X-API-KEY": API_KEY
+    }
+  }).catch((err, res, body) => {
+    if (err) {
+      console.log(body);
+      console.log(keys(err));
+      console.log(err.options);
+      err.send(err.response.body);
+    }
+  });
+  const dataToSend = trimResponse(data);
+  console.log(dataToSend);
+  console.log(typeof dataToSend);
+  res.send(dataToSend);
+})
+
 // Handle Individual Character Request
 router.get('/getCharacterInventory/:membershipType/:destinyMembershipId/:characterId', async (req, res, next) => {
   console.log('Character Inventory Request');
