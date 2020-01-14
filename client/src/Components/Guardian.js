@@ -15,7 +15,11 @@ const Guardian = ({ guardianInfo }) => {
   const { membershipId, membershipType, characterId } = guardianInfo;
   const classTypeRef = ["Titan", "Hunter", "Warlock"];
 
-
+  const test = async () => {
+    const data = await fetch(`/database/GetFullEquipment/${membershipType}/${membershipId}/${characterId}`);
+    const res = await data.json();
+    console.log(res);
+  }
 
   useEffect(() => {
     const getInventoryData = async () => {
@@ -27,8 +31,10 @@ const Guardian = ({ guardianInfo }) => {
     }
     getInventoryData();
   }, [membershipId, membershipType, characterId]);
+
   return (
     <div>
+      <button onClick={() => test()}>Test</button>
       <p>{classTypeRef[guardianInfo.classType]}</p>
       <ItemDisplay>
         {equipment.map(item =>

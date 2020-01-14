@@ -100,9 +100,10 @@ router.get('/getInstancedItemDetails/:membershipType/:destinyMembershipId/:itemI
   });
   const dataToSend = trimResponse(data);
   res.send(dataToSend);
-})
+});
 
-// Handle Individual Character Request
+
+// Handle Individual Character Inventory Request
 router.get('/getCharacterInventory/:membershipType/:destinyMembershipId/:characterId', async (req, res, next) => {
   console.log('Character Inventory Request');
   const data = await rp({

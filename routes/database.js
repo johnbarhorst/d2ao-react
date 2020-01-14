@@ -13,12 +13,9 @@ const API_KEY = process.env.API_KEY;
 let ROOT_PATH;
 process.env.DEV_MODE ? ROOT_PATH = 'https://localhost:3000/' : ROOT_PATH = '/';
 
-
-const sqlQuery = `
-                  SELECT json
-                  FROM ?
-                  WHERE id = ?
-                  `;
+const trimResponse = (data) => {
+  return JSON.stringify(JSON.parse(data).Response);
+}
 
 const convertHash = hash => {
   let x = parseInt(hash);
@@ -63,11 +60,59 @@ router.get('/GetItemDetails/:itemHash', async (req, res, next) => {
     if (err) {
       return console.error(err.message);
     }
-    console.log(typeof row.json);
-
     res.send(row.json);
   });
 });
+
+//TEST full Equipment details in one go:
+router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId', async (req, res) => {
+  const equipmentFromAPI = await rp({
+    url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=205`,
+    headers: {
+      "X-API-KEY": API_KEY
+    }
+  }).catch((err, res, body) => {
+    if (err) {
+      console.log(body);
+      console.log(keys(err));
+      console.log(err.options);
+      err.send(err.response.body);
+    }
+  });
+  const equipmentJson = await JSON.parse(equipmentFromAPI).Response.equipment.data.items;
+  const addItemInstances = await Promise.all(equipmentJson.map(async item => {
+    const data = await rp({
+      url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300`,
+      headers: {
+        "X-API-KEY": API_KEY
+      }
+    }).catch((err, res, body) => {
+      if (err) {
+        console.log(body);
+        console.log(keys(err));
+        console.log(err.options);
+        err.send(err.response.body);
+      }
+    });
+    const instanceDetails = await JSON.parse(data).Response.instance.data;
+    item.instanceDetails = instanceDetails;
+    return item;
+  }));
+  // const addStaticDetails = addItemInstances.map(item => {
+  //   db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
+  //     if (err) {
+  //       item.staticDetails = null;
+  //       return item;
+  //     }
+  //     const staticDetails = JSON.parse(row.json);
+  //     item.staticDetails = staticDetails;
+  //     return item;
+  //   });
+  // });
+  const toSend = JSON.stringify(addItemInstances);
+  console.log(typeof toSend);
+  res.send(toSend);
+})
 
 
 // db.close((err) => {
