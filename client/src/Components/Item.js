@@ -9,32 +9,43 @@ const ItemCard = styled.div`
 
 
 const Item = ({ membershipType, membershipId, itemData }) => {
-  const [item, setItem] = useState({});
+  const [itemInstance, setItemInstance] = useState({});
   const [itemPerks, setItemPerks] = useState([]);
-  const { itemInstanceId } = itemData;
-
-  const searchDB = async () => {
-    const data = await fetch(`/database/GetItemDetails/${itemData.itemHash}`);
-    const itemDetails = await data.json();
-    console.log(itemDetails);
-  }
+  const [staticItemDetails, setStaticItemDetails] = useState(null);
+  const { itemInstanceId, itemHash } = itemData;
 
   useEffect(() => {
-    const getItemDetails = async () => {
+    const getItemDetailsFromDB = async () => {
+      const data = await fetch(`/database/GetItemDetails/${itemHash}`);
+      const itemDetails = await data.json();
+      setStaticItemDetails(itemDetails);
+    }
+    getItemDetailsFromDB()
+
+  }, [itemHash])
+
+  useEffect(() => {
+    const getItemInstanceDetails = async () => {
       const data = await fetch(`/api/getInstancedItemDetails/${membershipType}/${membershipId}/${itemInstanceId}`);
       const res = await data.json();
       console.log(res);
-      setItem(res.instance.data);
+      setItemInstance(res.instance.data);
       if (res.perks.data) {
         setItemPerks(res.perks.data.perks);
       }
     }
-    getItemDetails();
+    getItemInstanceDetails();
 
   }, [itemInstanceId, membershipId, membershipType]);
   return (
-    <ItemCard onClick={() => searchDB()}>
-      <p>{itemInstanceId}</p>
+    <ItemCard>
+      {staticItemDetails ? (
+        <>
+          <img src={`https://www.bungie.net${staticItemDetails.displayProperties.icon}`}
+            alt={`${staticItemDetails.displayProperties.name}`} />
+          <p>{staticItemDetails.displayProperties.name}</p>
+        </>
+      ) : null}
     </ItemCard>
   )
 }
