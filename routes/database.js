@@ -98,19 +98,8 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     item.instanceDetails = instanceDetails;
     return item;
   }));
-  // const addStaticDetails = addItemInstances.map(item => {
-  //   db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
-  //     if (err) {
-  //       item.staticDetails = null;
-  //       return item;
-  //     }
-  //     const staticDetails = JSON.parse(row.json);
-  //     item.staticDetails = staticDetails;
-  //     return item;
-  //   });
-  // });
+
   const toSend = JSON.stringify(addItemInstances);
-  console.log(typeof toSend);
   res.send(toSend);
 })
 

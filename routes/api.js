@@ -26,6 +26,35 @@ const authCheck = (req, res, next) => {
   }
 };
 
+//Test Transfer Item Request API
+router.get('/Item/TransferItem', async (req, res, next) => {
+  console.log('Item Transfer');
+  rp({
+    method: 'POST',
+    url: `https://www.bungie.net/Platform/Destiny2/Actions/Items/TransferItem/`,
+    headers: {
+      "X-API-KEY": API_KEY
+    },
+    body: {
+      itemReferenceHash: number,
+      stackSize: number,
+      transferToVault: Boolean,
+      itemId: number,
+      characterId: number,
+      membershipType: number
+    }
+  }).catch((err, res, body) => {
+    if (err) {
+      console.log(body);
+      console.log(keys(err));
+      console.log(err.options);
+      err.send(err.response.body);
+    }
+  });
+  console.log(data);
+  res.send(data);
+})
+
 
 // Get Current User Data
 router.get('/Profile/getCurrentUser', authCheck, async (req, res, next) => {

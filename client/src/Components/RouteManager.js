@@ -4,6 +4,7 @@ import Loadouts from './Loadouts';
 import Login from './Login';
 import Home from './Home';
 import Profile from './Profile';
+import HashConverter from './HashConverter';
 
 const RouteManager = () => {
   return (
@@ -17,6 +18,9 @@ const RouteManager = () => {
         </Route>
         <Route path='/login'>
           <Login />
+        </Route>
+        <Route path='/hash'>
+          <HashConverter />
         </Route>
         <Route exact path='/'>
           <Home />

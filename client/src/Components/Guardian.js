@@ -20,6 +20,11 @@ const Guardian = ({ guardianInfo }) => {
     const res = await data.json();
     console.log(res);
   }
+  const testItem = async () => {
+    const data = await fetch(`/api/Item/TransferItem`);
+    const res = await data.json();
+    console.log(res);
+  }
 
   useEffect(() => {
     const getInventoryData = async () => {
@@ -35,6 +40,7 @@ const Guardian = ({ guardianInfo }) => {
   return (
     <div>
       <button onClick={() => test()}>Test</button>
+      <button onClick={() => testItem()}>Test Item</button>
       <p>{classTypeRef[guardianInfo.classType]}</p>
       <ItemDisplay>
         {equipment.map(item =>
