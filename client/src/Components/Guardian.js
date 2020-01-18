@@ -21,6 +21,14 @@ const Guardian = ({ guardianInfo }) => {
     console.log(res);
   }
   const testItem = async () => {
+    // Lots of steps to do here:
+    // check to see if the item is already in inventory. If not the request will fail.
+    // If it isn't, we have to find it first. Is it on another character? Or in the Vault?
+    // I think that to move them over, they have to go to the Vault first...
+    // So move from character that has it to the vault,
+    // Then from the vault to this character
+    // Then equip.
+    // Oh, also some of these requests have to happen 1 second apart, others 0.1s.
     const data = await fetch(`/api/Item/TransferItem`);
     const res = await data.json();
     console.log(res);
