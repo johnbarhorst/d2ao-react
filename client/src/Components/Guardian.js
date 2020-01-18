@@ -29,8 +29,15 @@ const Guardian = ({ guardianInfo }) => {
     // Then from the vault to this character
     // Then equip.
     // Oh, also some of these requests have to happen 1 second apart, others 0.1s.
+    // Transfer Item endpoint:  throttle is 0.1 seconds
+    // Equip item endpoint: throttle is 0.1 seconds
+    // Insert Socket Plug: throttle is 1 second
+
+    // Looks like fun!
+    // https://bungie-net.github.io/multi/schema_Destiny-Requests-Actions-DestinyInsertPlugsRequestEntry.html#schema_Destiny-Requests-Actions-DestinyInsertPlugsRequestEntry
+
+    //Not sure that this will actually be a fetch. though I think there is a success/failure response.
     const data = await fetch(`/api/Item/TransferItem`);
-    const res = await data.json();
     console.log(res);
   }
 
