@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Route, Switch, Link } from 'react-router-dom';
+import { Route, Switch, Link, useRouteMatch } from 'react-router-dom';
 import { UserContext } from '../Contexts';
 import { useSetPageTitle } from '../Hooks';
 import EmblemCard from './EmblemCard';
@@ -9,6 +9,7 @@ import Guardian from './Guardian';
 const Profile = () => {
   const UserInfo = useContext(UserContext);
   const { isLoggedIn, userProfile, guardians } = UserInfo;
+  const { url, path } = useRouteMatch();
   useSetPageTitle(userProfile.username);
 
   if (isLoggedIn) {
@@ -19,7 +20,7 @@ const Profile = () => {
         </div>
         {guardians.map(guardian =>
           <Link to={{
-            pathname: `/profile/${guardian.characterId}`,
+            pathname: `${url}/${guardian.characterId}`,
             state: { guardian }
           }}
             key={guardian.characterId}>
@@ -28,7 +29,7 @@ const Profile = () => {
         )}
         <div>
           <Switch>
-            <Route path={`/profile/:guardianId`}
+            <Route path={`${path}/:guardianId`}
               render={value => <Guardian guardianInfo={value.location.state.guardian} />}
             />
           </Switch>
