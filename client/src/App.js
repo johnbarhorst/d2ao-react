@@ -32,13 +32,11 @@ const App = () => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       const data = await fetch(`/auth/checkAuth`);
-      console.log(data);
       const res = await data.json();
-      console.log(res);
       setIsLoggedIn(res);
     }
     checkLoginStatus();
-  });
+  }, []);
 
   useEffect(() => {
     const updateUserProfile = async () => {
