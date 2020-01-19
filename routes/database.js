@@ -64,46 +64,6 @@ router.get('/GetItemDetails/:itemHash', async (req, res, next) => {
   });
 });
 
-//TEST full Equipment details in one go:
-router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId', async (req, res) => {
-  const equipmentFromAPI = await rp({
-    url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=205`,
-    headers: {
-      "X-API-KEY": API_KEY
-    }
-  }).catch((err, res, body) => {
-    if (err) {
-      console.log(body);
-      console.log(keys(err));
-      console.log(err.options);
-      err.send(err.response.body);
-    }
-  });
-  const equipmentJson = await JSON.parse(equipmentFromAPI).Response.equipment.data.items;
-  const addItemInstances = await Promise.all(equipmentJson.map(async item => {
-    const data = await rp({
-      url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300`,
-      headers: {
-        "X-API-KEY": API_KEY
-      }
-    }).catch((err, res, body) => {
-      if (err) {
-        console.log(body);
-        console.log(keys(err));
-        console.log(err.options);
-        err.send(err.response.body);
-      }
-    });
-    const instanceDetails = await JSON.parse(data).Response.instance.data;
-    item.instanceDetails = instanceDetails;
-    return item;
-  }));
-
-  const toSend = JSON.stringify(addItemInstances);
-  res.send(toSend);
-})
-
-
 // db.close((err) => {
 //   if (err) {
 //     console.error(err.message);
