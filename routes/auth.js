@@ -35,13 +35,13 @@ passport.deserializeUser((id, done) => {
 });
 
 
-router.use('/', (req, res, next) => {
-  keys(req);
-  keys(req.query);
-  console.log('Code:', req.query.code);
+// router.use('/', (req, res, next) => {
+//   keys(req);
+//   keys(req.query);
+//   console.log('Code:', req.query.code);
 
-  next();
-});
+//   next();
+// });
 
 //auth login
 
