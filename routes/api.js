@@ -26,9 +26,72 @@ const authCheck = (req, res, next) => {
   }
 };
 
+//TEST full Equipment details in one go:
+router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId', authCheck, async (req, res) => {
+  console.time('Full Inventory Request');
+  const ItemLocationTable = ["Unknown", "Inventory", "Vault", "Vendor", "Postmaster"]; //Bungie api enum.
+  const sortInventory = inv => {
+    console.time('Sort');
+    let sortedInventory = {};
+    inv.forEach(item => {
+      sortedInventory[item.bucketHash] ? sortedInventory[item.bucketHash].push(item) : sortedInventory[item.bucketHash] = [item];
+    });
+    console.timeEnd('Sort');
+    return sortedInventory;
+  }
+
+  const dataFromAPI = await rp({
+    url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=201,205`,
+    headers: {
+      "X-API-KEY": API_KEY
+    }
+  }).catch((err, res, body) => {
+    if (err) {
+      console.log('Error in GetFullEquipment, getting equipment from Bungie');
+      console.log(body);
+      console.log(keys(err));
+      console.log(err.options);
+      res.send(err)
+    }
+  });
+  const equipmentJson = await JSON.parse(dataFromAPI).Response.equipment.data.items;
+  const fullInventoryArray = await JSON.parse(dataFromAPI).Response.inventory.data.items;
+  const equipmentWithInstances = await Promise.all(equipmentJson.map(async item => {
+    const data = await rp({
+      url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300`,
+      headers: {
+        "X-API-KEY": API_KEY
+      }
+    }).catch((err, res, body) => {
+      if (err) {
+        console.log(body);
+        console.log(keys(err));
+        console.log(err.options);
+        err.send(err.response.body);
+      }
+    });
+    const instanceDetails = await JSON.parse(data).Response.instance.data;
+    item.instanceDetails = instanceDetails;
+    return item;
+  }));
+
+  const sortedInventoryArray = sortInventory(fullInventoryArray);
+
+  let payload = {
+    equipment: equipmentWithInstances,
+    inventory: sortedInventoryArray
+  }
+
+  const dataToSend = JSON.stringify(payload);
+  console.timeEnd('Full Inventory Request');
+  res.send(dataToSend);
+})
+
 //Test Transfer Item Request API
-router.get('/Item/TransferItem', async (req, res, next) => {
+// For multiple items at a time, bungie.net.../TransferItems
+router.get('/Item/TransferItem?itemReferenceHash&stackSize&transferToVault&itemId&characterId&membershipType', async (req, res, next) => {
   console.log('Item Transfer');
+  const { itemReferenceHash, stackSize, transferToVault, itemId, characterId, membershipType } = req.query;
   rp({
     method: 'POST',
     url: `https://www.bungie.net/Platform/Destiny2/Actions/Items/TransferItem/`,
@@ -36,12 +99,12 @@ router.get('/Item/TransferItem', async (req, res, next) => {
       "X-API-KEY": API_KEY
     },
     body: {
-      itemReferenceHash: number,
-      stackSize: number,
-      transferToVault: Boolean,
-      itemId: number,
-      characterId: number,
-      membershipType: number
+      itemReferenceHash, // Number or string?: regular item id
+      stackSize, // Number: number of items to transfer. Always 1 unless you're moving consumables, which... who'd do it?
+      transferToVault, // Boolean: True = to the vault, I think false = from the vault
+      itemId, // Number: instanceItemId
+      characterId, // Number: characterId
+      membershipType // Number: Xbox = 1, etc..
     }
   }).catch((err, res, body) => {
     if (err) {
@@ -60,8 +123,6 @@ router.get('/Item/TransferItem', async (req, res, next) => {
 router.get('/Profile/getCurrentUser', authCheck, async (req, res, next) => {
   console.log('Getting Current User Data');
   const { isLoggedIn, userId, userProfile } = req.session;
-  keys(req.session);
-  console.log('Session');
   res.send({
     isLoggedIn,
     userId,
@@ -87,9 +148,7 @@ router.get('/Item/:membershipType/:destinyMembershipId/:itemInstanceId', async (
   });
 
   const dataToSend = JSON.stringify(JSON.parse(data).Response);
-  console.log(dataToSend);
-  console.log(data);
-  res.send(data);
+  res.send(dataToSend);
 });
 
 // Handle Character List Request
