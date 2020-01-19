@@ -19,7 +19,7 @@ const App = () => {
   const getGuardians = async (platforms) => {
     if (platforms.length > 0) {
       const data = platforms.map(async char => {
-        const characters = await fetch(`api/GetCharacterList/${char.membershipType}/${char.membershipId}`);
+        const characters = await fetch(`/api/GetCharacterList/${char.membershipType}/${char.membershipId}`);
         const json = await characters.json();
         return Array.from(Object.values(json.characters.data));
       })
@@ -38,7 +38,7 @@ const App = () => {
       setIsLoggedIn(res);
     }
     checkLoginStatus();
-  }, []);
+  });
 
   useEffect(() => {
     const updateUserProfile = async () => {
