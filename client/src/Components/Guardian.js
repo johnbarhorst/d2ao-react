@@ -14,27 +14,20 @@ const Guardian = ({ guardianInfo }) => {
   const [equipment, setEquipment] = useState([]);
   const { membershipId, membershipType, characterId } = guardianInfo;
   const classTypeRef = ["Titan", "Hunter", "Warlock"];
-  const test = async () => {
-    const data = await fetch(`/api/GetFullEquipment/${membershipType}/${membershipId}/${characterId}`);
-    const res = await data.json();
-    console.log(res);
-  }
-
 
   useEffect(() => {
     const getInventoryData = async () => {
-      const data = await fetch(`/api/getCharacterInventory/${membershipType}/${membershipId}/${characterId}`);
+      const data = await fetch(`/api/GetFullEquipment/${membershipType}/${membershipId}/${characterId}`);
       const res = await data.json();
       console.log(res);
-      setInventory(res.inventory.data.items);
-      setEquipment(res.equipment.data.items);
+      setInventory(res.inventory);
+      setEquipment(res.equipment);
     }
     getInventoryData();
   }, [membershipId, membershipType, characterId]);
 
   return (
     <div>
-      <button onClick={() => test()}>Test</button>
       <p>{classTypeRef[guardianInfo.classType]}</p>
       <ItemDisplay>
         {equipment.map(item =>
@@ -44,6 +37,7 @@ const Guardian = ({ guardianInfo }) => {
             characterId={characterId}
             itemData={item}
             key={item.itemInstanceId}
+
           />
         )}
       </ItemDisplay>

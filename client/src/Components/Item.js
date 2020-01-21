@@ -44,19 +44,6 @@ const Item = ({ membershipType, membershipId, itemData }) => {
 
   }, [itemHash])
 
-  useEffect(() => {
-    const getItemInstanceDetails = async () => {
-      const data = await fetch(`/api/getInstancedItemDetails/${membershipType}/${membershipId}/${itemInstanceId}`);
-      const res = await data.json();
-      console.log(res);
-      setItemInstance(res.instance.data);
-      if (res.perks.data) {
-        setItemPerks(res.perks.data.perks);
-      }
-    }
-    getItemInstanceDetails();
-
-  }, [itemInstanceId, membershipId, membershipType]);
   return (
     <ItemCard>
       {staticItemDetails ? (
