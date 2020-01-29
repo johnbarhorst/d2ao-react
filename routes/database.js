@@ -2,12 +2,6 @@ const router = require('express').Router();
 const rp = require('request-promise-native');
 require('dotenv').config();
 const sqlite3 = require('sqlite3').verbose();
-let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
-  if (err) {
-    console.error(err.message);
-  }
-  console.log(('Connected to sqlite db'));
-});
 
 const API_KEY = process.env.API_KEY;
 let ROOT_PATH;
@@ -56,19 +50,24 @@ router.get('/ManifestPaths', async (req, res, next) => {
 })
 
 router.get('/GetItemDetails/:itemHash', async (req, res, next) => {
+  let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
   db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(req.params.itemHash)}`, (err, row) => {
     if (err) {
       return console.error(err.message);
     }
     res.send(row.json);
   });
+  db.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
 });
 
-// db.close((err) => {
-//   if (err) {
-//     console.error(err.message);
-//   }
-//   console.log('closing sqlite db');
-// })
+
 
 module.exports = router;
