@@ -64,6 +64,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     return sortedInventory;
   }
 
+  //Get equipped items (205) and inventory data (201) for character from Bungie: 
   const dataFromAPI = await rp({
     url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=201,205`,
     headers: {
@@ -81,7 +82,9 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
 
   const equipmentJson = await JSON.parse(dataFromAPI).Response.equipment.data.items;
   const fullInventoryArray = await JSON.parse(dataFromAPI).Response.inventory.data.items;
-  const equipmentWithInstances = await Promise.all(equipmentJson.map(async item => {
+
+  const equipmentWithDetails = await Promise.all(equipmentJson.map(async item => {
+    // Get item instance information from Bungie and attach to equipment:
     const data = await rp({
       url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300`,
       headers: {
@@ -96,12 +99,8 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       }
     });
     const instanceDetails = await JSON.parse(data).Response.instance.data;
-    item.instanceDetails = instanceDetails;
-    return item;
-  }));
-
-  const equipmentWithDetails = await Promise.all(equipmentWithInstances.map(async item => {
-    const details = await new Promise(resolve => {
+    // Get static details from the sqlite database and add to equipment
+    const staticDetails = await new Promise(resolve => {
       db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
         if (err) {
           return console.error(err.message);
@@ -109,9 +108,15 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
         resolve(JSON.parse(row.json));
       });
     });
-    item.staticDetails = details;
+    item.staticDetails = staticDetails;
+    item.instanceDetails = instanceDetails;
     return item;
   }));
+
+
+  // const equipmentWithDetails = await Promise.all(equipmentWithInstances.map(async item => {
+  //   return item;
+  // }));
 
   const sortedInventoryArray = sortInventory(fullInventoryArray);
 
