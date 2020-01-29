@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const rp = require('request-promise-native');
+const sqlite3 = require('sqlite3').verbose();
 require('dotenv').config();
 const API_KEY = process.env.API_KEY;
 let ROOT_PATH;
@@ -12,6 +13,23 @@ const keys = (object) => console.log(Array.from(Object.keys(object)));
 // Trim Response off the response from Bungie, then convert back to string to send.
 const trimResponse = (data) => {
   return JSON.stringify(JSON.parse(data).Response);
+}
+const convertHash = hash => {
+  let x = parseInt(hash);
+  if (x > 0xFFFFFFFF) {
+    console.error('Too big, must have a wrong number');
+
+  }
+  if (x > 0x7FFFFFFF) {
+    x = 0x100000000 - x;
+    if (x < 2147483648) {
+      return -x
+    }
+    else {
+      return -2147483648
+    }
+  }
+  return x;
 }
 
 //Middleware
@@ -26,10 +44,16 @@ const authCheck = (req, res, next) => {
   }
 };
 
-//TEST full Equipment details in one go:
+//Full Equipment details in one go:
 router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId', authCheck, async (req, res) => {
   console.time('Full Inventory Request');
   const ItemLocationTable = ["Unknown", "Inventory", "Vault", "Vendor", "Postmaster"]; //Bungie api enum.
+  let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
+
   const sortInventory = inv => {
     console.time('Sort');
     let sortedInventory = {};
@@ -54,6 +78,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       res.send(err)
     }
   });
+
   const equipmentJson = await JSON.parse(dataFromAPI).Response.equipment.data.items;
   const fullInventoryArray = await JSON.parse(dataFromAPI).Response.inventory.data.items;
   const equipmentWithInstances = await Promise.all(equipmentJson.map(async item => {
@@ -75,16 +100,34 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     return item;
   }));
 
+  const equipmentWithDetails = await Promise.all(equipmentWithInstances.map(async item => {
+    const details = await new Promise(resolve => {
+      db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        resolve(JSON.parse(row.json));
+      });
+    });
+    item.staticDetails = details;
+    return item;
+  }));
+
   const sortedInventoryArray = sortInventory(fullInventoryArray);
 
   let payload = {
-    equipment: equipmentWithInstances,
+    equipment: equipmentWithDetails,
     inventory: sortedInventoryArray
   }
 
   const dataToSend = JSON.stringify(payload);
   console.timeEnd('Full Inventory Request');
   res.send(dataToSend);
+  db.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
 })
 
 //Test Transfer Item Request API
