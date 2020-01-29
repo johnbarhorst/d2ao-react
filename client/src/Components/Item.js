@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const ItemCard = styled.div`
@@ -8,11 +8,8 @@ const ItemCard = styled.div`
 
 
 
-const Item = ({ membershipType, membershipId, itemData }) => {
-  const [itemInstance, setItemInstance] = useState({});
-  const [itemPerks, setItemPerks] = useState([]);
-  const [staticItemDetails, setStaticItemDetails] = useState(null);
-  const { itemInstanceId, itemHash } = itemData;
+const Item = ({ itemData }) => {
+  const { staticDetails, instanceDetails } = itemData;
   const testItem = async () => {
     // Lots of steps to do here:
     // check to see if the item is already in inventory. If not the request will fail.
@@ -34,25 +31,11 @@ const Item = ({ membershipType, membershipId, itemData }) => {
 
   }
 
-  useEffect(() => {
-    const getItemDetailsFromDB = async () => {
-      const data = await fetch(`/database/GetItemDetails/${itemHash}`);
-      const itemDetails = await data.json();
-      setStaticItemDetails(itemDetails);
-    }
-    getItemDetailsFromDB()
-
-  }, [itemHash])
-
   return (
     <ItemCard>
-      {staticItemDetails ? (
-        <>
-          <img src={`https://www.bungie.net${staticItemDetails.displayProperties.icon}`}
-            alt={`${staticItemDetails.displayProperties.name}`} />
-          <p>{staticItemDetails.displayProperties.name}</p>
-        </>
-      ) : null}
+      <img src={`https://www.bungie.net${staticDetails.displayProperties.icon}`}
+        alt={`${staticDetails.displayProperties.name}`} />
+      <p>{staticDetails.displayProperties.name}</p>
       <button onClick={() => testItem()}>Test Item</button>
     </ItemCard>
   )

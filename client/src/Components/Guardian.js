@@ -32,12 +32,8 @@ const Guardian = ({ guardianInfo }) => {
       <ItemDisplay>
         {equipment.map(item =>
           <Item
-            membershipType={membershipType}
-            membershipId={membershipId}
-            characterId={characterId}
             itemData={item}
             key={item.itemInstanceId}
-
           />
         )}
       </ItemDisplay>
