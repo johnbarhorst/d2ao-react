@@ -9,6 +9,20 @@ process.env.DEV_MODE ? ROOT_PATH = 'https://localhost:3000/' : ROOT_PATH = '/';
 //Helpful little debugging function
 const keys = (object) => console.log(Array.from(Object.keys(object)));
 
+// Bungie enums:
+const itemStateEnum = {
+  0: 'none',
+  1: 'locked item',
+  2: 'tracked item',
+  4: 'masterwork item'
+};
+
+const transferStatusEnum = {
+  0: 'Can Transfer',
+  1: 'Item is equipped',
+  2: 'Non-transferrable item',
+  4: 'No room in transfer destination'
+};
 
 // Trim Response off the response from Bungie, then convert back to string to send.
 const trimResponse = (data) => {
