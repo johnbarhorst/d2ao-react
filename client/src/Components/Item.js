@@ -4,6 +4,10 @@ import styled from 'styled-components';
 const ItemCard = styled.div`
   border: 1px solid black;
   border-radius: 5px;
+  & img {
+    margin: 5px;
+    border: 1px solid #333;
+  }
 `;
 
 

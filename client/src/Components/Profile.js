@@ -7,10 +7,11 @@ import EmblemCard from './EmblemCard';
 import Guardian from './Guardian';
 
 const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin: 0 10px;
+margin-bottom: 1em;
+`;
+
+const GuardianList = styled.div`
+  display: flex;
 `;
 
 const Profile = () => {
@@ -26,7 +27,7 @@ const Profile = () => {
           <h3>{userProfile.username}</h3>
         </div>
         <Wrapper>
-          <div>
+          <GuardianList>
             {guardians.map(guardian =>
               <Link to={{
                 pathname: `${url}/${guardian.characterId}`,
@@ -36,7 +37,7 @@ const Profile = () => {
                 <EmblemCard {...guardian} />
               </Link>
             )}
-          </div>
+          </GuardianList>
           <div>
             <Switch>
               <Route path={`${path}/:guardianId`}
