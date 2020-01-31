@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const Card = styled.div`
   display: flex;
   justify-content: space-between;
-  background-image: url(${props => 'https://www.bungie.net' + props.bgPath});
+  background: #ffffff url(${props => 'https://www.bungie.net' + props.bgPath}) no-repeat;
   color: #f5f5f5;
   width: 474px;
   height: 96px;
