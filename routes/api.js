@@ -24,6 +24,15 @@ const transferStatusEnum = {
   4: 'No room in transfer destination'
 };
 
+const flagEnum = (state, value) => !!(state & value);
+const itemStateEnumFunctionExample = {
+  none: flagEnum(state, 0),
+  locked: flagEnum(state, 1),
+  tracked: flagEnum(state, 2),
+  masterwork: flagEnum(state, 4),
+  lockedAndMasterwork: flagEnum(state, 5)
+};
+
 // Trim Response off the response object from Bungie, then convert back to string to send.
 const trimResponse = (data) => {
   return JSON.stringify(JSON.parse(data).Response);
