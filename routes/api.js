@@ -25,12 +25,12 @@ const transferStatusEnum = {
 };
 
 const flagEnum = (state, value) => !!(state & value);
-const itemStateEnumFunctionExample = {
-  none: flagEnum(state, 0),
-  locked: flagEnum(state, 1),
-  tracked: flagEnum(state, 2),
-  masterwork: flagEnum(state, 4),
-  lockedAndMasterwork: flagEnum(state, 5)
+const itemStateEnumFlag = {
+  none: state => flagEnum(state, 0),
+  locked: state => flagEnum(state, 1),
+  tracked: state => flagEnum(state, 2),
+  masterwork: state => flagEnum(state, 4),
+  lockedAndMasterwork: state => flagEnum(state, 5)
 };
 
 // Trim Response off the response object from Bungie, then convert back to string to send.
