@@ -24,10 +24,12 @@ const transferStatusEnum = {
   4: 'No room in transfer destination'
 };
 
-// Trim Response off the response from Bungie, then convert back to string to send.
+// Trim Response off the response object from Bungie, then convert back to string to send.
 const trimResponse = (data) => {
   return JSON.stringify(JSON.parse(data).Response);
 }
+
+// Hash converter for sqlite look ups
 const convertHash = hash => {
   let x = parseInt(hash);
   if (x > 0xFFFFFFFF) {
@@ -82,7 +84,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     return sortedInventory;
   }
 
-  //Get equipped items (205) and inventory data (201) for character from Bungie: 
+  //Get equipped items (205) and inventory (201) data for character from Bungie: 
   const dataFromAPI = await rp({
     url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=201,205`,
     headers: {
@@ -102,8 +104,9 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
   const equipmentArray = await JSON.parse(dataFromAPI).Response.equipment.data.items;
   const fullInventoryArray = await JSON.parse(dataFromAPI).Response.inventory.data.items;
 
-  // Get static and instanced item information:
+  // Get instanced and static item information for equipped items:
   const equipmentWithDetails = await Promise.all(equipmentArray.map(async item => {
+
     // Get item instance information from Bungie
     const data = await rp({
       url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300`,
@@ -139,7 +142,9 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     return item;
   }));
 
+  // Get static and instanced item information for inventory items
   const fullInventoryWithDetails = await Promise.all(fullInventoryArray.map(async item => {
+    // Get static details from the sqlite database
     const staticDetails = await new Promise(resolve => {
       db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
         if (err) {
@@ -149,6 +154,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       });
     });
 
+    // Get bucket definitions details from the sqlite database
     const bucketDetails = await new Promise(resolve => {
       db.get(`SELECT json FROM DestinyInventoryBucketDefinition WHERE id = ${convertHash(item.bucketHash)}`, (err, row) => {
         if (err) {
@@ -157,11 +163,14 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
         resolve(JSON.parse(row.json));
       })
     });
+
+    // Attach sqlite info to each item
     item.staticDetails = staticDetails;
     item.bucketDetails = bucketDetails;
     return item;
   }));
 
+  // Sort the inventory items by bucket, and change hashes to the display name for easy reading
   const sortedInventoryArray = sortInventory(fullInventoryWithDetails);
 
   let payload = {
