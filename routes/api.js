@@ -122,8 +122,6 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     item.staticDetails = staticDetails;
     item.instanceDetails = instanceDetails;
 
-
-
     return item;
   }));
 
