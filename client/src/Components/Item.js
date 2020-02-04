@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 const ItemCard = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   border: 1px solid black;
   border-radius: 5px;
   & img {
@@ -14,6 +16,8 @@ const ItemCard = styled.div`
 
 const Item = ({ itemData }) => {
   const { staticDetails, instanceDetails } = itemData;
+  const damageTypeEnum = ["None", "Kinetic", "Arc", "Solar", "Void", "Raid"];
+  const energyTypeEnum = ["Any", "Arc", "Solar", "Void"];
   const testItem = async () => {
     // Lots of steps to do here:
     // check to see if the item is already in inventory. If not the request will fail.
@@ -37,10 +41,23 @@ const Item = ({ itemData }) => {
 
   return (
     <ItemCard>
-      <img src={`https://www.bungie.net${staticDetails.displayProperties.icon}`}
-        alt={`${staticDetails.displayProperties.name}`} />
-      <p>{staticDetails.displayProperties.name}</p>
-      <button onClick={() => testItem()}>Test Item</button>
+      <div>
+        <img src={`https://www.bungie.net${staticDetails.displayProperties.icon}`}
+          alt={`${staticDetails.displayProperties.name}`} />
+        <p>{staticDetails.displayProperties.name}</p>
+        <button onClick={() => testItem()}>Test Item</button>
+      </div>
+      <div>
+        {instanceDetails.damageType > 0 && (
+          <p>{damageTypeEnum[instanceDetails.damageType]}</p>
+        )}
+        {instanceDetails.energy && (
+          <>
+            <p>{energyTypeEnum[instanceDetails.energy.energyType]}</p>
+            <p>Max Energy: {instanceDetails.energy.energyCapacity}</p>
+          </>
+        )}
+      </div>
     </ItemCard>
   )
 }

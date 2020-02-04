@@ -72,7 +72,7 @@ const authCheck = (req, res, next) => {
 //Full Equipment details in one go:
 router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId', authCheck, async (req, res) => {
   console.time('Full Inventory Request');
-  const ItemLocationTable = ["Unknown", "Inventory", "Vault", "Vendor", "Postmaster"]; //Bungie api enum.
+  const ItemLocationEnum = ["Unknown", "Inventory", "Vault", "Vendor", "Postmaster"]; //Bungie api enum.
   let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
     if (err) {
       console.error(err.message);
@@ -189,7 +189,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
 
   const dataToSend = JSON.stringify(payload);
   console.timeEnd('Full Inventory Request');
-  res.send(dataToSend);
+  res.status(200).send(dataToSend);
   db.close((err) => {
     if (err) {
       console.error(err.message);
