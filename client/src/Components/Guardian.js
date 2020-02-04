@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import Item from './Item';
-
-const ItemDisplay = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 10px;
-`;
+import EquippedItems from './EquippedItems';
 
 
 const Guardian = ({ guardianInfo }) => {
@@ -33,14 +26,7 @@ const Guardian = ({ guardianInfo }) => {
     <div>
       <h2>{classTypeRef[guardianInfo.classType]}</h2>
       {loading ? <h1>Loading</h1> :
-        <ItemDisplay>
-          {equipment.map(item =>
-            <Item
-              itemData={item}
-              key={item.itemInstanceId}
-            />
-          )}
-        </ItemDisplay>
+        <EquippedItems equipment={equipment} />
       }
     </div>
   )
