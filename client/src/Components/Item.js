@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import ItemStatCard from './ItemStatCard';
 
 const ItemCard = styled.div`
   display: grid;
@@ -57,6 +58,7 @@ const Item = ({ itemData }) => {
             <p>Max Energy: {instanceDetails.energy.energyCapacity}</p>
           </>
         )}
+        <ItemStatCard investmentStats={staticDetails.investmentStats} />
       </div>
     </ItemCard>
   )
