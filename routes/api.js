@@ -143,13 +143,27 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       });
     });
 
+    item.staticDetails.investmentStats = await Promise.all(item.staticDetails.investmentStats.map(async stat => {
+      return {
+        ...stat,
+        statDefinition: await new Promise(resolve => {
+          db.get(`SELECT json FROM DestinyStatDefinition WHERE id = ${convertHash(stat.statTypeHash)}`, (err, row) => {
+            if (err) {
+              return console.error(err.message);
+            }
+            resolve(JSON.parse(row.json));
+          })
+        })
+      }
+    }))
+
     return item;
   }));
 
   // Get static and instanced item information for inventory items
   const fullInventoryWithDetails = await Promise.all(fullInventoryArray.map(async item => {
     // Get static details from the sqlite database
-    const staticDetails = await new Promise(resolve => {
+    item.staticDetails = await new Promise(resolve => {
       db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
         if (err) {
           return console.error(err.message);
@@ -159,7 +173,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     });
 
     // Get bucket definitions details from the sqlite database
-    const bucketDetails = await new Promise(resolve => {
+    item.bucketDetails = await new Promise(resolve => {
       db.get(`SELECT json FROM DestinyInventoryBucketDefinition WHERE id = ${convertHash(item.bucketHash)}`, (err, row) => {
         if (err) {
           return console.error(err.message);
@@ -168,9 +182,6 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       })
     });
 
-    // Attach sqlite info to each item
-    item.staticDetails = staticDetails;
-    item.bucketDetails = bucketDetails;
     return item;
   }));
 
