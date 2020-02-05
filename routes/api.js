@@ -115,7 +115,6 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
 
   // Get instanced and static item information for equipped items:
   const equipmentWithDetails = await Promise.all(equipmentArray.map(async item => {
-
     // Get item instance information from Bungie
     const data = await rp({
       url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300`,
@@ -132,10 +131,10 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     });
 
     //Trim some layers off the response from bungie and parse the JSON:
-    const instanceDetails = await JSON.parse(data).Response.instance.data;
+    item.instanceDetails = await JSON.parse(data).Response.instance.data;
 
     // Get static details from the sqlite database
-    const staticDetails = await new Promise(resolve => {
+    item.staticDetails = await new Promise(resolve => {
       db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
         if (err) {
           return console.error(err.message);
@@ -143,10 +142,6 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
         resolve(JSON.parse(row.json));
       });
     });
-
-    // Attach details to the item object:
-    item.staticDetails = staticDetails;
-    item.instanceDetails = instanceDetails;
 
     return item;
   }));
