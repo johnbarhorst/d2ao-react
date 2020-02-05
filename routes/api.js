@@ -143,6 +143,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       });
     });
 
+    // Add definitions to each stat from the db
     item.staticDetails.investmentStats = await Promise.all(item.staticDetails.investmentStats.map(async stat => {
       return {
         ...stat,
