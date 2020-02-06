@@ -93,6 +93,17 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     return sortedInventory;
   }
 
+  const getFromDB = async (hash, table) => {
+    return await new Promise(resolve => {
+      db.get(`SELECT json FROM ${table} WHERE id = ${convertHash(hash)}`, (err, row) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        resolve(JSON.parse(row.json));
+      })
+    })
+  }
+
   //Get equipped items (205) and inventory (201) data for character from Bungie: 
   const dataFromAPI = await rp({
     url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=201,205`,
@@ -137,32 +148,19 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     item.stats = await Promise.all(Array.from(Object.values((await JSON.parse(data).Response.stats.data || { stats: {} }).stats).map(async stat => {
       return {
         ...stat,
-        statDefinitions: await new Promise(resolve => {
-          db.get(`SELECT json FROM DestinyStatDefinition WHERE id = ${convertHash(stat.statHash)}`, (err, row) => {
-            if (err) {
-              return console.error(err.message);
-            }
-            resolve(JSON.parse(row.json));
-          })
-        })
+        statDefinitions: await getFromDB(stat.statHash, 'DestinyStatDefinition')
       }
     })));
     item.sockets = (await JSON.parse(data).Response.sockets.data || { sockets: {} }).sockets;
-    item.perks = (await JSON.parse(data).Response.perks.data || { perks: {} }).perks;
+    item.perks = await Promise.all(((await JSON.parse(data).Response.perks.data || { perks: [] }).perks).map(async perk => {
+      return {
+        ...perk,
+        perkDefinitions: getFromDB(perk.perkHash, 'DestinySandboxPerkDefinition')
+      }
+    }));
 
     // Get static details from the sqlite database
-    item.staticDetails = await new Promise(resolve => {
-      db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
-        if (err) {
-          return console.error(err.message);
-        }
-        resolve(JSON.parse(row.json));
-      });
-    });
-
-
-
-
+    item.staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition')
 
     return item;
   }));
@@ -170,24 +168,10 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
   // Get static and instanced item information for inventory items
   const fullInventoryWithDetails = await Promise.all(fullInventoryArray.map(async item => {
     // Get static details from the sqlite database
-    item.staticDetails = await new Promise(resolve => {
-      db.get(`SELECT json FROM DestinyInventoryItemDefinition WHERE id = ${convertHash(item.itemHash)}`, (err, row) => {
-        if (err) {
-          return console.error(err.message);
-        }
-        resolve(JSON.parse(row.json));
-      });
-    });
+    item.staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition');
 
     // Get bucket definitions details from the sqlite database
-    item.bucketDetails = await new Promise(resolve => {
-      db.get(`SELECT json FROM DestinyInventoryBucketDefinition WHERE id = ${convertHash(item.bucketHash)}`, (err, row) => {
-        if (err) {
-          return console.error(err.message);
-        }
-        resolve(JSON.parse(row.json));
-      })
-    });
+    item.bucketDetails = await getFromDB(item.bucketHash, 'DestinyInventoryBucketDefinition');
 
     return item;
   }));
