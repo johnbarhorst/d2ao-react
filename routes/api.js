@@ -132,9 +132,23 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
 
     //Trim some layers off the response from bungie and parse the JSON:
     item.instanceDetails = await JSON.parse(data).Response.instance.data || {};
-    item.stats = await JSON.parse(data).Response.stats.data || {};
-    item.sockets = await JSON.parse(data).Response.sockets.data || {};
-    item.perks = await JSON.parse(data).Response.perks.data || {};
+    // If item has no stat object, add an empty one to avoid bugs
+    // Then get each stats definition from the DB, and tack it on to the stat object.
+    item.stats = await Promise.all(Array.from(Object.values((await JSON.parse(data).Response.stats.data || { stats: {} }).stats).map(async stat => {
+      return {
+        ...stat,
+        statDefinitions: await new Promise(resolve => {
+          db.get(`SELECT json FROM DestinyStatDefinition WHERE id = ${convertHash(stat.statHash)}`, (err, row) => {
+            if (err) {
+              return console.error(err.message);
+            }
+            resolve(JSON.parse(row.json));
+          })
+        })
+      }
+    })));
+    item.sockets = (await JSON.parse(data).Response.sockets.data || { sockets: {} }).sockets;
+    item.perks = (await JSON.parse(data).Response.perks.data || { perks: {} }).perks;
 
     // Get static details from the sqlite database
     item.staticDetails = await new Promise(resolve => {
@@ -146,7 +160,8 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       });
     });
 
-    // Add definitions to each stat from the db
+
+
 
 
     return item;
