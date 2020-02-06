@@ -97,6 +97,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     return await new Promise(resolve => {
       db.get(`SELECT json FROM ${table} WHERE id = ${convertHash(hash)}`, (err, row) => {
         if (err) {
+          console.log(err);
           return console.error(err.message);
         }
         resolve(JSON.parse(row.json));
@@ -134,10 +135,13 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       }
     }).catch((err, res, body) => {
       if (err) {
+        console.log('Error Body:');
         console.log(body);
+        console.log("Keys of err:")
         console.log(keys(err));
+        console.log("err.options:")
         console.log(err.options);
-        err.send(err.response.body);
+        err.send(err);
       }
     });
 
@@ -151,11 +155,16 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
         statDefinitions: await getFromDB(stat.statHash, 'DestinyStatDefinition')
       }
     })));
-    item.sockets = (await JSON.parse(data).Response.sockets.data || { sockets: {} }).sockets;
+    item.sockets = await Promise.all(((await JSON.parse(data).Response.sockets.data || { sockets: [] }).sockets).map(async socket => {
+      return {
+        ...socket,
+        plugDefinitions: socket.plugHash ? await getFromDB(socket.plugHash, 'DestinyInventoryItemDefinition') : {}
+      }
+    }));
     item.perks = await Promise.all(((await JSON.parse(data).Response.perks.data || { perks: [] }).perks).map(async perk => {
       return {
         ...perk,
-        perkDefinitions: getFromDB(perk.perkHash, 'DestinySandboxPerkDefinition')
+        perkDefinitions: await getFromDB(perk.perkHash, 'DestinySandboxPerkDefinition')
       }
     }));
 
