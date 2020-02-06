@@ -117,7 +117,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
   const equipmentWithDetails = await Promise.all(equipmentArray.map(async item => {
     // Get item instance information from Bungie
     const data = await rp({
-      url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300`,
+      url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300,302,304,305`,
       headers: {
         "X-API-KEY": API_KEY
       }
@@ -131,7 +131,10 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     });
 
     //Trim some layers off the response from bungie and parse the JSON:
-    item.instanceDetails = await JSON.parse(data).Response.instance.data;
+    item.instanceDetails = await JSON.parse(data).Response.instance.data || {};
+    item.stats = await JSON.parse(data).Response.stats.data || {};
+    item.sockets = await JSON.parse(data).Response.sockets.data || {};
+    item.perks = await JSON.parse(data).Response.perks.data || {};
 
     // Get static details from the sqlite database
     item.staticDetails = await new Promise(resolve => {
@@ -144,19 +147,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     });
 
     // Add definitions to each stat from the db
-    item.staticDetails.investmentStats = await Promise.all(item.staticDetails.investmentStats.map(async stat => {
-      return {
-        ...stat,
-        statDefinition: await new Promise(resolve => {
-          db.get(`SELECT json FROM DestinyStatDefinition WHERE id = ${convertHash(stat.statTypeHash)}`, (err, row) => {
-            if (err) {
-              return console.error(err.message);
-            }
-            resolve(JSON.parse(row.json));
-          })
-        })
-      }
-    }))
+
 
     return item;
   }));

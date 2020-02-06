@@ -58,7 +58,7 @@ const Item = ({ itemData }) => {
             <p>Max Energy: {instanceDetails.energy.energyCapacity}</p>
           </>
         )}
-        <ItemStatCard investmentStats={staticDetails.investmentStats} />
+
       </div>
     </ItemCard>
   )
