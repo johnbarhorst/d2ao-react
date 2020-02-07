@@ -1,22 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
 import ItemStatCard from './ItemStatCard';
+import SocketsCard from './SocketsCard';
 
 const ItemCard = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   border: 1px solid black;
   border-radius: 5px;
-  & img {
-    margin: 5px;
-    border: 1px solid #333;
-  }
-`;
+  `;
+
+const Img = styled.img`
+margin: 5px;
+border: 1px solid #333;
+`
 
 
 
 const Item = ({ itemData }) => {
-  const { staticDetails, instanceDetails, stats } = itemData;
+  const { staticDetails, instanceDetails, stats, sockets } = itemData;
   const damageTypeEnum = ["None", "Kinetic", "Arc", "Solar", "Void", "Raid"];
   const energyTypeEnum = ["Any", "Arc", "Solar", "Void"];
   const testItem = async () => {
@@ -43,7 +45,7 @@ const Item = ({ itemData }) => {
   return (
     <ItemCard>
       <div>
-        <img src={`https://www.bungie.net${staticDetails.displayProperties.icon}`}
+        <Img src={`https://www.bungie.net${staticDetails.displayProperties.icon}`}
           alt={`${staticDetails.displayProperties.name}`} />
         <p>{staticDetails.displayProperties.name}</p>
         <button onClick={() => testItem()}>Test Item</button>
@@ -59,6 +61,7 @@ const Item = ({ itemData }) => {
           </>
         )}
         <ItemStatCard stats={stats} />
+        {sockets && <SocketsCard sockets={sockets} />}
       </div>
     </ItemCard>
   )
