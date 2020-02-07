@@ -16,7 +16,7 @@ const ItemCard = styled.div`
 
 
 const Item = ({ itemData }) => {
-  const { staticDetails, instanceDetails } = itemData;
+  const { staticDetails, instanceDetails, stats } = itemData;
   const damageTypeEnum = ["None", "Kinetic", "Arc", "Solar", "Void", "Raid"];
   const energyTypeEnum = ["Any", "Arc", "Solar", "Void"];
   const testItem = async () => {
@@ -58,7 +58,7 @@ const Item = ({ itemData }) => {
             <p>Max Energy: {instanceDetails.energy.energyCapacity}</p>
           </>
         )}
-
+        <ItemStatCard stats={stats} />
       </div>
     </ItemCard>
   )

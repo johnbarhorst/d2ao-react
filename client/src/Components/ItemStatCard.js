@@ -1,17 +1,13 @@
 import React from 'react';
 
-const ItemStatCard = ({ investmentStats }) => {
+const ItemStatCard = ({ stats }) => {
 
   return (
-    <div>
-      {investmentStats.map(stat => (
-        <React.Fragment key={stat.statTypeHash} >
-          {stat.value > 0 && (
-            <p>{stat.statDefinition.displayProperties.name}: {stat.value}</p>
-          )}
-        </React.Fragment>
+    <ul>
+      {stats.map(stat => (
+        <li key={stat.statHash}>{stat.statDefinitions.displayProperties.name}: {stat.value}</li>
       ))}
-    </div>
+    </ul>
   )
 }
 export default ItemStatCard;
