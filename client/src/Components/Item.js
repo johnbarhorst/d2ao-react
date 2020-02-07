@@ -41,6 +41,17 @@ const Item = ({ itemData }) => {
     const data = await fetch(`/api/Item/TransferItem`);
 
   }
+  const sortSockets = socket => {
+    let sortedSockets = {};
+    socket.forEach(socket => {
+      if (socket.plugDefinitions.itemTypeDisplayName) {
+        sortedSockets[socket.plugDefinitions.itemTypeDisplayName] ? sortedSockets[socket.plugDefinitions.itemTypeDisplayName].push(socket) : sortedSockets[socket.plugDefinitions.itemTypeDisplayName] = [socket];
+      }
+    })
+    return sortedSockets
+  }
+  const sortedSockets = sortSockets(sockets);
+  console.log(sortedSockets);
 
   return (
     <ItemCard>
