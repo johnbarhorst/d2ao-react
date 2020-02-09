@@ -41,11 +41,17 @@ const Item = ({ itemData }) => {
     const data = await fetch(`/api/Item/TransferItem`);
 
   }
+
+  const toCamelCase = (str) => {
+    return str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+  }
   const sortSockets = socket => {
     let sortedSockets = {};
     socket.forEach(socket => {
       if (socket.plugDefinitions.itemTypeDisplayName) {
-        sortedSockets[socket.plugDefinitions.itemTypeDisplayName] ? sortedSockets[socket.plugDefinitions.itemTypeDisplayName].push(socket) : sortedSockets[socket.plugDefinitions.itemTypeDisplayName] = [socket];
+        sortedSockets[toCamelCase(socket.plugDefinitions.itemTypeDisplayName)] ?
+          sortedSockets[toCamelCase(socket.plugDefinitions.itemTypeDisplayName)].push(socket) :
+          sortedSockets[toCamelCase(socket.plugDefinitions.itemTypeDisplayName)] = [socket];
       }
     })
     return sortedSockets

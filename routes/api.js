@@ -81,12 +81,15 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
 
   const sortInventory = inv => {
     console.time('Sort');
+    const toCamelCase = (str) => {
+      return str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+    }
     let sortedInventory = {};
     inv.forEach(item => {
       if (item.bucketDetails.displayProperties.name) {
-        sortedInventory[item.bucketDetails.displayProperties.name] ?
-          sortedInventory[item.bucketDetails.displayProperties.name].push(item) :
-          sortedInventory[item.bucketDetails.displayProperties.name] = [item];
+        sortedInventory[toCamelCase(item.bucketDetails.displayProperties.name)] ?
+          sortedInventory[toCamelCase(item.bucketDetails.displayProperties.name)].push(item) :
+          sortedInventory[toCamelCase(item.bucketDetails.displayProperties.name)] = [item];
       }
     });
     console.timeEnd('Sort');
