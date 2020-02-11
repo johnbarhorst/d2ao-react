@@ -317,7 +317,7 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
       ...guardian,
       race: raceTypeRef[guardian.raceType],
       gender: genderTypeRef[guardian.genderType],
-      guardianClass: classTypeRef[guardian.raceType],
+      guardianClass: classTypeRef[guardian.classType],
     }
   });
   const payload = {
