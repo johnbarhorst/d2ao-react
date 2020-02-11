@@ -18,8 +18,8 @@ const App = () => {
 
   const getGuardians = async (platforms) => {
     if (platforms.length > 0) {
-      const data = platforms.map(async char => {
-        const characters = await fetch(`/api/GetCharacterList/${char.membershipType}/${char.membershipId}`);
+      const data = platforms.map(async ({ membershipType, membershipId }) => {
+        const characters = await fetch(`/api/GetCharacterList/${membershipType}/${membershipId}`);
         const json = await characters.json();
         return Array.from(Object.values(json.characters.data));
       })
