@@ -129,7 +129,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
   const fullInventoryArray = await JSON.parse(dataFromAPI).Response.inventory.data.items;
 
   // Get instanced and static item information for equipped items:
-  const equipmentWithDetails = await Promise.all(equipmentArray.map(async item => {
+  const equipmentWithDetails = await Promise.all(equipmentArray.map(async (item, index) => {
     // Get item instance information from Bungie
     const data = await rp({
       url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Item/${item.itemInstanceId}/?components=300,302,304,305`,
@@ -152,6 +152,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     item.instanceDetails = await JSON.parse(data).Response.instance.data || {};
     // If item has no stat object, add an empty one to avoid bugs
     // Then get each stats definition from the DB, and tack it on to the stat object.
+    console.time(`DB ${index}`);
     item.stats = await Promise.all(Array.from(Object.values((await JSON.parse(data).Response.stats.data || { stats: {} }).stats).map(async stat => {
       return {
         ...stat,
@@ -170,10 +171,12 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
         perkDefinitions: await getFromDB(perk.perkHash, 'DestinySandboxPerkDefinition')
       }
     }));
+    item.bucket = await getFromDB(item.bucketHash, 'DestinyInventoryBucketDefinition');
+
 
     // Get static details from the sqlite database
-    item.staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition')
-
+    item.staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition');
+    console.timeEnd(`DB ${index}`);
     return item;
   }));
 
@@ -273,6 +276,23 @@ router.get('/Item/:membershipType/:destinyMembershipId/:itemInstanceId', async (
 // Handle Character List Request
 router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req, res, next) => {
   console.log('Character List Request');
+  let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
+
+  const getFromDB = async (hash, table) => {
+    return await new Promise(resolve => {
+      db.get(`SELECT json FROM ${table} WHERE id = ${convertHash(hash)}`, (err, row) => {
+        if (err) {
+          console.log(err);
+          return console.error(err.message);
+        }
+        resolve(JSON.parse(row.json));
+      })
+    })
+  }
   const data = await rp({
     url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/?components=200,100`,
     headers: {
