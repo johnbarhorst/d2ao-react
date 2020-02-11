@@ -312,14 +312,21 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
   const profile = await JSON.parse(data).Response.profile
   const characters = await JSON.parse(data).Response.characters;
   const guardians = Array.from(Object.values(characters.data));
-  const guardiansWithData = guardians.map(guardian => {
+  const guardiansWithData = await Promise.all(guardians.map(async guardian => {
+    guardian.stats = await Promise.all((Array.from(Object.keys(guardian.stats))).map(async stat => {
+      const details = await getFromDB(convertHash(stat), 'DestinyStatDefinition')
+      return {
+        ...details,
+        value: guardian.stats[stat]
+      }
+    }))
     return {
       ...guardian,
       race: raceTypeRef[guardian.raceType],
       gender: genderTypeRef[guardian.genderType],
       guardianClass: classTypeRef[guardian.classType],
     }
-  });
+  }));
   const payload = {
     profile: profile,
     characters: guardiansWithData
