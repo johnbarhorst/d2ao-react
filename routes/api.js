@@ -309,7 +309,7 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
       err.send(err.response.body);
     }
   });
-  const profile = await JSON.parse(data).Response.profile
+  const profile = await JSON.parse(data).Response.profile.data;
   const characters = await JSON.parse(data).Response.characters;
   const guardians = Array.from(Object.values(characters.data));
   const guardiansWithData = await Promise.all(guardians.map(async guardian => {

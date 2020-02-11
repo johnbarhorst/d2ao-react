@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import GuardianStatCard from './GuardianStatCard';
 import EquippedItems from './EquippedItems';
+
+const GuardianStatDisplay = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
 
 
 const Guardian = ({ guardianInfo }) => {
   const [inventory, setInventory] = useState([]);
   const [equipment, setEquipment] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { membershipId, membershipType, characterId } = guardianInfo;
-  const classTypeRef = ["Titan", "Hunter", "Warlock"];
+  const { membershipId, membershipType, characterId, guardianClass, stats } = guardianInfo;
 
   useEffect(() => {
     const getInventoryData = async () => {
@@ -24,7 +30,10 @@ const Guardian = ({ guardianInfo }) => {
 
   return (
     <div>
-      <h2>{classTypeRef[guardianInfo.classType]}</h2>
+      <h2>{guardianClass}</h2>
+      <GuardianStatDisplay>
+        {stats.map(stat => <GuardianStatCard stat={stat} key={stat.hash} />)}
+      </GuardianStatDisplay>
       {loading ? <h1>Loading</h1> :
         <EquippedItems equipment={equipment} />
       }
