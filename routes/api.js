@@ -57,6 +57,11 @@ const convertHash = hash => {
   return x;
 }
 
+const handleRPError = (err) => {
+  const error = JSON.parse(err.error);
+  throw new Error(err.error);
+}
+
 //Middleware
 const authCheck = (req, res, next) => {
   if (!req.user) {
@@ -114,15 +119,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
     headers: {
       "X-API-KEY": API_KEY
     }
-  }).catch((err, res, body) => {
-    if (err) {
-      console.log('Error in GetFullEquipment, getting equipment from Bungie');
-      console.log(body);
-      console.log(keys(err));
-      console.log(err.options);
-      res.send(err)
-    }
-  });
+  }).catch((err) => handleRPError(err));
 
   // Parse JSON and trim off some object layers from API response
   const equipmentArray = await JSON.parse(dataFromAPI).Response.equipment.data.items;
@@ -136,17 +133,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
       headers: {
         "X-API-KEY": API_KEY
       }
-    }).catch((err, res, body) => {
-      if (err) {
-        console.log('Error Body:');
-        console.log(body);
-        console.log("Keys of err:")
-        console.log(keys(err));
-        console.log("err.options:")
-        console.log(err.options);
-        err.send(err);
-      }
-    });
+    }).catch((err) => handleRPError(err));
 
     //Trim some layers off the response from bungie and parse the JSON:
     item.instanceDetails = await JSON.parse(data).Response.instance.data || {};
@@ -228,14 +215,7 @@ router.get('/Item/TransferItem?itemReferenceHash&stackSize&transferToVault&itemI
       characterId, // Number: characterId
       membershipType // Number: Xbox = 1, etc..
     }
-  }).catch((err, res, body) => {
-    if (err) {
-      console.log(body);
-      console.log(keys(err));
-      console.log(err.options);
-      err.send(err.response.body);
-    }
-  });
+  }).catch((err) => handleRPError(err));
   console.log(data);
   res.send(data);
 })
@@ -260,14 +240,7 @@ router.get('/Item/:membershipType/:destinyMembershipId/:itemInstanceId', async (
     headers: {
       "X-API-KEY": API_KEY
     }
-  }).catch((err, res, body) => {
-    if (err) {
-      console.log(body);
-      console.log(keys(err));
-      console.log(err.options);
-      err.send(err.response.body);
-    }
-  });
+  }).catch((err) => handleRPError(err));
 
   const dataToSend = JSON.stringify(JSON.parse(data).Response);
   res.send(dataToSend);
@@ -301,14 +274,7 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
     headers: {
       "X-API-KEY": API_KEY
     }
-  }).catch((err, res, body) => {
-    if (err) {
-      console.log(body);
-      console.log(keys(err));
-      console.log(err.options);
-      err.send(err.response.body);
-    }
-  });
+  }).catch((err) => handleRPError(err));
   const profile = await JSON.parse(data).Response.profile.data;
   const characters = await JSON.parse(data).Response.characters;
   const guardians = Array.from(Object.values(characters.data));
@@ -347,14 +313,7 @@ router.get('/getInstancedItemDetails/:membershipType/:destinyMembershipId/:itemI
     headers: {
       "X-API-KEY": API_KEY
     }
-  }).catch((err, res, body) => {
-    if (err) {
-      console.log(body);
-      console.log(keys(err));
-      console.log(err.options);
-      err.send(err.response.body);
-    }
-  });
+  }).catch((err) => handleRPError(err));
   const dataToSend = trimResponse(data);
   res.send(dataToSend);
 });
@@ -368,14 +327,7 @@ router.get('/getCharacterInventory/:membershipType/:destinyMembershipId/:charact
     headers: {
       "X-API-KEY": API_KEY
     }
-  }).catch((err, res, body) => {
-    if (err) {
-      console.log(body);
-      console.log(keys(err));
-      console.log(err.options);
-      err.send(err.response.body);
-    }
-  });
+  }).catch((err) => handleRPError(err));
   const dataToSend = trimResponse(data);
   res.send(dataToSend);
 });
