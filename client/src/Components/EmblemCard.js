@@ -32,21 +32,15 @@ const Card = styled.div`
   }
 `;
 
-const classTypeRef = ["Titan", "Hunter", "Warlock"];
-const genderTypeRef = ["Male", "Female"];
-const raceTypeRef = ["Human", "Awoken", "Exo"];
-
-
-const EmblemCard = (props) => {
-
+const EmblemCard = ({ race, gender, light, guardianClass, emblemBackgroundPath }) => {
   return (
-    <Card bgPath={props.emblemBackgroundPath}>
+    <Card bgPath={emblemBackgroundPath}>
       <div className='class-race' >
-        <h3>{classTypeRef[props.classType]}</h3>
-        <p>{`${raceTypeRef[props.raceType]} ${genderTypeRef[props.genderType]}`}</p>
+        <h3>{guardianClass}</h3>
+        <p>{`${race} ${gender}`}</p>
       </div>
       <div>
-        <h2>{props.light}</h2>
+        <h2>{light}</h2>
       </div>
     </Card>
   )

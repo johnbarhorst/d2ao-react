@@ -276,6 +276,9 @@ router.get('/Item/:membershipType/:destinyMembershipId/:itemInstanceId', async (
 // Handle Character List Request
 router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req, res, next) => {
   console.log('Character List Request');
+  const classTypeRef = ["Titan", "Hunter", "Warlock"];
+  const genderTypeRef = ["Male", "Female"];
+  const raceTypeRef = ["Human", "Awoken", "Exo"];
   let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
     if (err) {
       console.error(err.message);
@@ -306,8 +309,28 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
       err.send(err.response.body);
     }
   });
-  const dataToSend = trimResponse(data);
-  res.send(dataToSend);
+  const profile = await JSON.parse(data).Response.profile
+  const characters = await JSON.parse(data).Response.characters;
+  const guardians = Array.from(Object.values(characters.data));
+  const guardiansWithData = guardians.map(guardian => {
+    return {
+      ...guardian,
+      race: raceTypeRef[guardian.raceType],
+      gender: genderTypeRef[guardian.genderType],
+      guardianClass: classTypeRef[guardian.raceType],
+    }
+  });
+  const payload = {
+    profile: profile,
+    characters: guardiansWithData
+  }
+  const dataToSend = JSON.stringify(payload);
+  res.status(200).send(dataToSend);
+  db.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
 });
 
 // Handle Individual Item Request 
