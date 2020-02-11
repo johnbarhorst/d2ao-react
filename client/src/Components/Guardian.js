@@ -6,6 +6,7 @@ import EquippedItems from './EquippedItems';
 const GuardianStatDisplay = styled.div`
   display: flex;
   justify-content: space-between;
+  margin-bottom: 20px;  
 `;
 
 

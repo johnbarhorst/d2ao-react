@@ -5,7 +5,7 @@ const GuardianStatCard = ({ stat }) => {
   return (
     <>
       {hasIcon && (<img src={`https://www.bungie.net${stat.displayProperties.icon}`} style={{ backgroundColor: '#333' }} />)}
-      <p>{name}</p>
+      <p>{name}: {stat.value}</p>
     </>
   )
 }
