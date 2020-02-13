@@ -115,7 +115,7 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
 
   //Get equipped items (205) and inventory (201) data for character from Bungie: 
   const dataFromAPI = await rp({
-    url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=201,205`,
+    url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/Character/${req.params.characterId}/?components=201,205,300,302,304,305`,
     headers: {
       "X-API-KEY": API_KEY
     }
@@ -124,6 +124,9 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
   // Parse JSON and trim off some object layers from API response
   const equipmentArray = await JSON.parse(dataFromAPI).Response.equipment.data.items;
   const fullInventoryArray = await JSON.parse(dataFromAPI).Response.inventory.data.items;
+  const itemComponents = await JSON.parse(dataFromAPI).Response.itemComponents.instances.data;
+  keys(JSON.parse(dataFromAPI).Response);
+
 
   // Get instanced and static item information for equipped items:
   const equipmentWithDetails = await Promise.all(equipmentArray.map(async (item, index) => {
@@ -183,7 +186,8 @@ router.get('/GetFullEquipment/:membershipType/:destinyMembershipId/:characterId'
 
   let payload = {
     equipment: equipmentWithDetails,
-    inventory: sortedInventoryArray
+    inventory: sortedInventoryArray,
+    itemComponents
   }
 
   const dataToSend = JSON.stringify(payload);
@@ -270,11 +274,12 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
     })
   }
   const data = await rp({
-    url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/?components=200,100`,
+    url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/?components=100,102,103,200,201,205,300,304,305`,
     headers: {
       "X-API-KEY": API_KEY
     }
   }).catch((err) => handleRPError(err));
+  const testData = await JSON.parse(data).Response;
   const profile = await JSON.parse(data).Response.profile.data;
   const characters = await JSON.parse(data).Response.characters;
   const guardians = Array.from(Object.values(characters.data));
@@ -295,7 +300,8 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
   }));
   const payload = {
     profile: profile,
-    characters: guardiansWithData
+    characters: guardiansWithData,
+    testData
   }
   const dataToSend = JSON.stringify(payload);
   res.status(200).send(dataToSend);
@@ -345,5 +351,58 @@ router.get('/search/:search', async (req, res, next) => {
   });
   res.send(data);
 });
+
+router.get('/db/:table/:hash', async (req, res, next) => {
+  let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
+  const getFromDB = async (hash, table) => {
+    return await new Promise(resolve => {
+      db.get(`SELECT json FROM ${table} WHERE id = ${convertHash(hash)}`, (err, row) => {
+        if (!row) {
+          return resolve({ response: 'Not found, perhaps wrong table?' })
+        }
+        if (err) {
+          console.log(err);
+          return console.error(err.message);
+        }
+        resolve(JSON.parse(row.json));
+      })
+    })
+  }
+  const { table, hash } = req.params;
+  const data = await getFromDB(hash, table);
+  const json = JSON.stringify(data);
+  res.send(json);
+  db.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
+});
+
+router.get('/tables', async (req, res, next) => {
+  let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
+  const tables = await new Promise(resolve => (db.all(`SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%'`, (err, row) => {
+    if (err) {
+      console.log(err);
+      return console.error(err.message);
+    }
+    resolve(row);
+  })));
+  const data = JSON.stringify(tables.map(table => table.name));
+  db.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+  });
+  res.send(data);
+})
 
 module.exports = router;

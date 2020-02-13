@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DBLookup from './DBLookup';
 
 const HashConverter = () => {
   const [value, setValue] = useState('');
@@ -33,7 +34,7 @@ const HashConverter = () => {
         <input type="text" name="controlled" id="controlled" onChange={(e) => setValue(e.target.value)} value={value} />
         <button type="submit">Convert Hash</button>
       </form>
-
+      <DBLookup />
     </div>
   )
 }
