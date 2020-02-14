@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import JSONParser from './JSONParser';
 
 
 const DBLookup = () => {
@@ -38,6 +39,7 @@ const DBLookup = () => {
         <input type="text" name="controlledHash" id="controlledHash" onChange={(e) => setHash(e.target.value)} value={hash} />
         <button type="submit">Get From Database</button>
       </form>
+      {/* <JSONParser json={dbData} /> */}
       <div><pre>{JSON.stringify(dbData, null, 2)}</pre></div>
     </div>
   )
