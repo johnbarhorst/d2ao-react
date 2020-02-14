@@ -274,16 +274,61 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
     })
   }
   const data = await rp({
+    // components: Profile(100) ProfileInventories(102) ProfileCurrencies(103)
+    // Characters(200) CharacterInventories(201) CharacterEquipment(205) 
+    // ItemInstances(300) ItemStats(304) ItemSockets(305) 
     url: `https://www.bungie.net/Platform/Destiny2/${req.params.membershipType}/Profile/${req.params.destinyMembershipId}/?components=100,102,103,200,201,205,300,304,305`,
     headers: {
       "X-API-KEY": API_KEY
     }
   }).catch((err) => handleRPError(err));
-  const testData = await JSON.parse(data).Response;
-  const profile = await JSON.parse(data).Response.profile.data;
-  const characters = await JSON.parse(data).Response.characters;
-  const guardians = Array.from(Object.values(characters.data));
+
+  //Trim off some object layers from all the response items
+  const response = await JSON.parse(data).Response;
+  const profile = response.profile.data;
+  const characters = response.characters.data;
+  const profilePlugSets = response.profilePlugSets.data.plugs;
+  const profileInventory = response.profileInventory.data.items;
+  const characterInventories = response.characterInventories.data;
+  const characterEquipment = response.characterEquipment.data;
+  const instances = response.itemComponents.instances.data;
+  const sockets = response.itemComponents.sockets.data;
+  const stats = response.itemComponents.stats.data;
+  const guardians = Array.from(Object.values(characters));
+
+
+
+
+
   const guardiansWithData = await Promise.all(guardians.map(async guardian => {
+    const getInstanceDetails = item => item.itemInstanceId ? instances[item.itemInstanceId] : {};
+    const getItemStats = async item => {
+      const itemStats = item.itemInstanceId ? (stats[item.itemInstanceId] || { stats: {} }).stats : {};
+      return await Promise.all(Array.from(Object.values(itemStats).map(async stat => {
+        const statDefinitions = await getFromDB(stat.statHash, 'DestinyStatDefinition');
+        return {
+          ...stat,
+          displayProperties: statDefinitions.displayProperties,
+          statDefinitions
+        }
+      })))
+    }
+    const getItemProps = async itemArray => {
+      return await Promise.all(itemArray.map(async item => {
+        const staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition');
+        return {
+          ...item,
+          displayProperties: staticDetails.displayProperties,
+          instanceDetails: getInstanceDetails(item),
+          itemStats: await getItemStats(item),
+          staticDetails
+        }
+      }))
+    }
+
+    guardian.inventory = await getItemProps(characterInventories[guardian.characterId].items);
+    guardian.equipment = await getItemProps(characterEquipment[guardian.characterId].items);
+
     guardian.stats = await Promise.all((Array.from(Object.keys(guardian.stats))).map(async stat => {
       const details = await getFromDB(convertHash(stat), 'DestinyStatDefinition')
       return {
@@ -299,9 +344,9 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
     }
   }));
   const payload = {
-    profile: profile,
+    profile,
     characters: guardiansWithData,
-    testData
+    response
   }
   const dataToSend = JSON.stringify(payload);
   res.status(200).send(dataToSend);
@@ -352,6 +397,7 @@ router.get('/search/:search', async (req, res, next) => {
   res.send(data);
 });
 
+// Small helper routes to make looking up database stuff easier. Not for production
 router.get('/db/:table/:hash', async (req, res, next) => {
   let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
     if (err) {
@@ -383,6 +429,7 @@ router.get('/db/:table/:hash', async (req, res, next) => {
   });
 });
 
+// Small helper routes to make looking up database stuff easier. Not for production
 router.get('/tables', async (req, res, next) => {
   let db = new sqlite3.Database('./database.sqlite3', sqlite3.OPEN_READONLY, (err) => {
     if (err) {
