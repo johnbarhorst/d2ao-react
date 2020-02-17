@@ -9,7 +9,7 @@ const GuardianStatCard = ({ stat }) => {
   const { description, hasIcon, name } = stat.displayProperties;
   return (
     <Div>
-      {hasIcon && (<img src={`https://www.bungie.net${stat.displayProperties.icon}`} style={{ backgroundColor: '#333' }} />)}
+      {hasIcon && (<img src={`https://www.bungie.net${stat.displayProperties.icon}`} style={{ backgroundColor: '#333' }} alt={{ name }} />)}
       <p>{name}: {stat.value}</p>
     </Div>
   )
