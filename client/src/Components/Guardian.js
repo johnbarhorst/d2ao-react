@@ -11,23 +11,7 @@ const GuardianStatDisplay = styled.div`
 
 
 const Guardian = ({ guardianInfo }) => {
-  const [inventory, setInventory] = useState([]);
-  const [equipment, setEquipment] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { membershipId, membershipType, characterId, guardianClass, stats } = guardianInfo;
-
-  useEffect(() => {
-    const getInventoryData = async () => {
-      setLoading(true);
-      const data = await fetch(`/api/GetFullEquipment/${membershipType}/${membershipId}/${characterId}`);
-      const res = await data.json();
-      console.log(res);
-      setInventory(res.inventory);
-      setEquipment(res.equipment);
-      setLoading(false);
-    }
-    getInventoryData();
-  }, [membershipId, membershipType, characterId]);
+  const { membershipId, membershipType, characterId, guardianClass, stats, equipment, inventory } = guardianInfo;
 
   return (
     <div>
@@ -35,9 +19,7 @@ const Guardian = ({ guardianInfo }) => {
       <GuardianStatDisplay>
         {stats.map(stat => <GuardianStatCard stat={stat} key={stat.hash} />)}
       </GuardianStatDisplay>
-      {loading ? <h1>Loading</h1> :
-        <EquippedItems equipment={equipment} />
-      }
+      <EquippedItems equipment={equipment} />
     </div>
   )
 }

@@ -320,15 +320,15 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
     const getItemProps = async itemArray => {
       return await Promise.all(itemArray.map(async item => {
         const staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition');
-        const socketList = await getItemSockets(item);
-        const itemStats = await getItemStats(item);
+        const sockets = await getItemSockets(item);
+        const stats = await getItemStats(item);
         const instanceDetails = getInstanceDetails(item)
         return {
           ...item,
           displayProperties: staticDetails.displayProperties,
           instanceDetails,
-          itemStats,
-          socketList,
+          stats,
+          sockets,
           staticDetails
         }
       }))

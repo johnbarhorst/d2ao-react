@@ -10,7 +10,7 @@ const SocketsCard = ({ sockets }) => {
     <div>
       {sockets.map(socket => {
         if (socket.isVisible && socket.plugHash) {
-          const { description, hasIcon, icon, name } = socket.plugDefinitions.displayProperties;
+          const { description, hasIcon, icon, name } = socket.displayProperties;
           return (
             <React.Fragment key={socket.plugHash}>
               {hasIcon && <Img src={`https://www.bungie.net${icon}`} />}
