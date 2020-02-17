@@ -224,7 +224,6 @@ router.get('/Item/TransferItem?itemReferenceHash&stackSize&transferToVault&itemI
   res.send(data);
 })
 
-
 // Get Current User Data
 router.get('/Profile/getCurrentUser', authCheck, async (req, res, next) => {
   console.log('Getting Current User Data');
@@ -286,7 +285,6 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
   //Trim off some object layers from all the response items
   const response = await JSON.parse(data).Response;
   const profile = response.profile.data;
-  const characters = response.characters.data;
   const profilePlugSets = response.profilePlugSets.data.plugs;
   const profileInventory = response.profileInventory.data.items;
   const characterInventories = response.characterInventories.data;
@@ -294,14 +292,20 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
   const instances = response.itemComponents.instances.data;
   const sockets = response.itemComponents.sockets.data;
   const stats = response.itemComponents.stats.data;
-  const guardians = Array.from(Object.values(characters));
 
-
-
-
-
-  const guardiansWithData = await Promise.all(guardians.map(async guardian => {
+  const guardians = Array.from(Object.values(response.characters.data));
+  const characters = await Promise.all(guardians.map(async guardian => {
     const getInstanceDetails = item => item.itemInstanceId ? instances[item.itemInstanceId] : {};
+    const getItemSockets = item => {
+      const socketArray = item.itemInstanceId ? (sockets[item.itemInstanceId] || { sockets: [] }).sockets : [];
+      return Promise.all(socketArray.map(async socket => {
+        const plugDefinitions = socket.plugHash ? await getFromDB(socket.plugHash, 'DestinyInventoryItemDefinition') : {}
+        return {
+          ...socket,
+          ...plugDefinitions
+        }
+      }))
+    }
     const getItemStats = async item => {
       const itemStats = item.itemInstanceId ? (stats[item.itemInstanceId] || { stats: {} }).stats : {};
       return await Promise.all(Array.from(Object.values(itemStats).map(async stat => {
@@ -316,11 +320,15 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
     const getItemProps = async itemArray => {
       return await Promise.all(itemArray.map(async item => {
         const staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition');
+        const socketList = await getItemSockets(item);
+        const itemStats = await getItemStats(item);
+        const instanceDetails = getInstanceDetails(item)
         return {
           ...item,
           displayProperties: staticDetails.displayProperties,
-          instanceDetails: getInstanceDetails(item),
-          itemStats: await getItemStats(item),
+          instanceDetails,
+          itemStats,
+          socketList,
           staticDetails
         }
       }))
@@ -328,7 +336,9 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
 
     guardian.inventory = await getItemProps(characterInventories[guardian.characterId].items);
     guardian.equipment = await getItemProps(characterEquipment[guardian.characterId].items);
-
+    guardian.race = raceTypeRef[guardian.raceType];
+    guardian.gender = genderTypeRef[guardian.genderType];
+    guardian.guardianClass = classTypeRef[guardian.classType];
     guardian.stats = await Promise.all((Array.from(Object.keys(guardian.stats))).map(async stat => {
       const details = await getFromDB(convertHash(stat), 'DestinyStatDefinition')
       return {
@@ -336,16 +346,13 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
         value: guardian.stats[stat]
       }
     }))
-    return {
-      ...guardian,
-      race: raceTypeRef[guardian.raceType],
-      gender: genderTypeRef[guardian.genderType],
-      guardianClass: classTypeRef[guardian.classType],
-    }
+    return guardian;
   }));
   const payload = {
     profile,
-    characters: guardiansWithData,
+    // using characters here instead of guardians since that's how it's labeled in Bungie's api.
+    // I don't really feel good about it though.
+    characters,
     response
   }
   const dataToSend = JSON.stringify(payload);
