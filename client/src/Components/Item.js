@@ -79,8 +79,8 @@ const Item = ({ itemData }) => {
             <p>Max Energy: {instanceDetails.energy.energyCapacity}</p>
           </>
         ) : null}
-        {stats && <ItemStatCard stats={stats} />}
-        {sockets && <SocketsCard sockets={sockets} />}
+        {stats && stats.length > 0 ? <ItemStatCard stats={stats} /> : null}
+        {sockets && sockets.length > 0 ? <SocketsCard sockets={sockets} /> : null}
       </div>
     </ItemCard>
   )
