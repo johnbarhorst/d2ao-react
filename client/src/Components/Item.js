@@ -60,22 +60,26 @@ const Item = ({ itemData }) => {
   return (
     <ItemCard>
       <div>
-        <Img src={`https://www.bungie.net${displayProperties.icon}`}
-          alt={`${displayProperties.name}`} />
-        <p>{displayProperties.name}</p>
-        <button onClick={() => testItem()}>Test Item</button>
+        {displayProperties && displayProperties.hasIcon ? (
+          <>
+            <Img src={`https://www.bungie.net${displayProperties.icon}`}
+              alt={`${displayProperties.name}`} />
+            <p>{displayProperties.name}</p>
+          </>
+        ) : null}
+        {/* <button onClick={() => testItem()}>Test Item</button> */}
       </div>
       <div>
-        {instanceDetails.damageType > 0 && (
+        {instanceDetails && instanceDetails.damageType > 0 ? (
           <p>{damageTypeEnum[instanceDetails.damageType]}</p>
-        )}
-        {instanceDetails.energy && (
+        ) : null}
+        {instanceDetails && instanceDetails.energy ? (
           <>
             <p>{energyTypeEnum[instanceDetails.energy.energyType]}</p>
             <p>Max Energy: {instanceDetails.energy.energyCapacity}</p>
           </>
-        )}
-        <ItemStatCard stats={stats} />
+        ) : null}
+        {stats && <ItemStatCard stats={stats} />}
         {sockets && <SocketsCard sockets={sockets} />}
       </div>
     </ItemCard>

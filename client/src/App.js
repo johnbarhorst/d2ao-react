@@ -4,6 +4,7 @@ import {
 } from "react-router-dom";
 import Navigation from './Components/Navigation';
 import RouteManager from './Components/RouteManager';
+import Vault from './Components/Vault';
 import { UserContext } from './Contexts';
 import 'normalize.css';
 import './global.css';
@@ -15,17 +16,22 @@ const App = () => {
   const [userProfile, setUserProfile] = useState({});
   const [platforms, setPlatforms] = useState([]);
   const [guardians, setGuardians] = useState([]);
+  const [vault, setVault] = useState([]);
 
   const getGuardians = async (platforms) => {
     if (platforms.length > 0) {
-      const data = platforms.map(async ({ membershipType, membershipId }) => {
+      const data = await Promise.all(platforms.map(async ({ membershipType, membershipId }) => {
         const characters = await fetch(`/api/GetCharacterList/${membershipType}/${membershipId}`);
         const json = await characters.json();
         console.log(json);
-        return json.characters;
-      })
-      const guardianList = await Promise.all(data);
-      return setGuardians(...guardianList);
+        return json;
+      }))
+      const guardianList = data.map(data => data.characters);
+      const vaultItems = data.map(data => data.vault);
+      console.log(guardianList);
+      setGuardians(...guardianList);
+      setVault(...vaultItems);
+      return
     }
     return setGuardians([]);
   }
@@ -58,11 +64,12 @@ const App = () => {
 
 
   return (
-    <UserContext.Provider value={{ isLoggedIn, userProfile, platforms, guardians }}>
+    <UserContext.Provider value={{ isLoggedIn, userProfile, platforms, guardians, vault }}>
       <Router>
         <div className="App">
           <Navigation />
           <RouteManager />
+          <Vault vault={vault} />
         </div>
       </Router>
     </UserContext.Provider>
