@@ -15,8 +15,6 @@ margin: 5px;
 border: 1px solid #333;
 `
 
-
-
 const Item = ({ itemData }) => {
   const { staticDetails, instanceDetails, stats, sockets } = itemData;
   const damageTypeEnum = ["None", "Kinetic", "Arc", "Solar", "Void", "Raid"];
@@ -38,7 +36,7 @@ const Item = ({ itemData }) => {
     // https://bungie-net.github.io/multi/schema_Destiny-Requests-Actions-DestinyInsertPlugsRequestEntry.html#schema_Destiny-Requests-Actions-DestinyInsertPlugsRequestEntry
 
     //Not sure that this will actually be a fetch. though I think there is a success/failure response.
-    const data = await fetch(`/api/Item/TransferItem`);
+    // const data = await fetch(`/api/Item/TransferItem`);
 
   }
 
