@@ -249,7 +249,7 @@ router.get('/Item/:membershipType/:destinyMembershipId/:itemInstanceId', async (
   res.send(dataToSend);
 });
 
-// Handle Character List Request
+// Handle Character List and Inventory Request
 router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req, res, next) => {
   console.log('Character List Request');
   const classTypeRef = ["Titan", "Hunter", "Warlock"];
@@ -315,8 +315,10 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
       }
     })))
   }
+
   const getItemProps = async itemArray => {
     return await Promise.all(itemArray.map(async item => {
+      const bucketDetails = await getFromDB(item.bucketHash, 'DestinyInventoryBucketDefinition');
       const staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition');
       const sockets = await getItemSockets(item);
       const stats = await getItemStats(item);
@@ -324,6 +326,7 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
       return {
         ...item,
         displayProperties: staticDetails.displayProperties,
+        bucketDetails,
         instanceDetails,
         stats,
         sockets,
