@@ -17,6 +17,8 @@ const SocketsCard = ({ sockets }) => {
               <p>{name}</p>
             </React.Fragment>
           )
+        } else {
+          return null
         }
       })}
     </div>

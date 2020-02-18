@@ -4,7 +4,6 @@ import {
 } from "react-router-dom";
 import Navigation from './Components/Navigation';
 import RouteManager from './Components/RouteManager';
-import Vault from './Components/Vault';
 import { UserContext } from './Contexts';
 import 'normalize.css';
 import './global.css';
