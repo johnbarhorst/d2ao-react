@@ -1,5 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+import Vault from './Vault';
 import Loadouts from './Loadouts';
 import Login from './Login';
 import Home from './Home';
@@ -10,6 +11,9 @@ const RouteManager = () => {
   return (
     <div>
       <Switch>
+        <Route path='/vault'>
+          <Vault />
+        </Route>
         <Route path='/loadouts'>
           <Loadouts />
         </Route>

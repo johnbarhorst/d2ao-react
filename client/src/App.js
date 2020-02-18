@@ -69,7 +69,6 @@ const App = () => {
         <div className="App">
           <Navigation />
           <RouteManager />
-          <Vault vault={vault} />
         </div>
       </Router>
     </UserContext.Provider>

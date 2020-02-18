@@ -28,6 +28,7 @@ const Navigation = () => {
         <Ul>
           {/* TODO: NavLink */}
           <Li><Link to='/'>Destiny 2 Armor Optimizer</Link></Li>
+          <Li><Link to='/vault'>Vault</Link></Li>
           <Li><Link to='/loadouts'>Loadouts</Link></Li>
           {UserInfo.isLoggedIn ? (
             <Li><Link to='/profile'>Profile</Link></Li>
