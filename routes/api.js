@@ -305,15 +305,28 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
     }))
   }
   const getItemStats = async item => {
+
     const itemStats = item.itemInstanceId ? (stats[item.itemInstanceId] || { stats: {} }).stats : {};
     return await Promise.all(Array.from(Object.values(itemStats).map(async stat => {
       const statDefinitions = await getFromDB(stat.statHash, 'DestinyStatDefinition');
       return {
         ...stat,
         displayProperties: statDefinitions.displayProperties,
-        statDefinitions
+        statDefinitions,
       }
     })))
+  }
+
+  const getStaticItemStats = async staticDetails => {
+    const staticStatArray = staticDetails.stats ? Array.from(Object.values(staticDetails.stats.stats)) : [];
+    return await Promise.all(staticStatArray.map(async stat => {
+      const details = await getFromDB(stat.statHash, 'DestinyStatDefinition');
+      return {
+        ...stat,
+        displayProperties: details.displayProperties,
+
+      }
+    }))
   }
 
   const getItemProps = async itemArray => {
@@ -322,6 +335,7 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
       const staticDetails = await getFromDB(item.itemHash, 'DestinyInventoryItemDefinition');
       const sockets = await getItemSockets(item);
       const stats = await getItemStats(item);
+      const staticStats = await getStaticItemStats(staticDetails);
       const instanceDetails = getInstanceDetails(item)
       return {
         ...item,
@@ -329,6 +343,7 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
         bucketDetails,
         instanceDetails,
         stats,
+        staticStats,
         sockets,
         staticDetails
       }
