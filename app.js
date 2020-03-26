@@ -19,7 +19,10 @@ const app = express();
 
 const serverListenTime = function () {
   const today = new Date();
-  const time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+  const addZero = i => {
+    return i < 10 ? '0' + i : i;
+  }
+  const time = `${addZero(today.getHours())}:${addZero(today.getMinutes())}:${addZero(today.getSeconds())}`;
   return time;
 }
 
