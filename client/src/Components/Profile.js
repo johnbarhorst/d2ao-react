@@ -11,7 +11,7 @@ margin-bottom: 1em;
 `;
 
 const GuardianList = styled.div`
-  display: flex;
+  /* display: flex; */
 `;
 
 const Profile = () => {

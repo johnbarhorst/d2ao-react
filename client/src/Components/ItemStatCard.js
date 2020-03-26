@@ -5,7 +5,7 @@ const ItemStatCard = ({ stats }) => {
   return (
     <ul>
       {stats.map(stat => (
-        <li key={stat.statHash}>{stat.statDefinitions.displayProperties.name}: {stat.value}</li>
+        <li key={stat.statHash}>{stat.displayProperties.name}: {stat.value}</li>
       ))}
     </ul>
   )

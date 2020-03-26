@@ -317,8 +317,8 @@ router.get('/GetCharacterList/:membershipType/:destinyMembershipId', async (req,
     })))
   }
 
-  const getStaticItemStats = async staticDetails => {
-    const staticStatArray = staticDetails.stats ? Array.from(Object.values(staticDetails.stats.stats)) : [];
+  const getStaticItemStats = async item => {
+    const staticStatArray = item.stats ? Array.from(Object.values(item.stats.stats)) : [];
     return await Promise.all(staticStatArray.map(async stat => {
       const details = await getFromDB(stat.statHash, 'DestinyStatDefinition');
       return {

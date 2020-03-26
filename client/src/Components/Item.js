@@ -16,7 +16,7 @@ border: 1px solid #333;
 `
 
 const Item = ({ itemData }) => {
-  const { displayProperties, instanceDetails, stats, sockets } = itemData;
+  const { displayProperties, instanceDetails, stats, sockets, staticStats } = itemData;
   const damageTypeEnum = ["None", "Kinetic", "Arc", "Solar", "Void", "Raid"];
   const energyTypeEnum = ["Any", "Arc", "Solar", "Void"];
   const testItem = async () => {
@@ -80,6 +80,7 @@ const Item = ({ itemData }) => {
           </>
         ) : null}
         {stats && stats.length > 0 ? <ItemStatCard stats={stats} /> : null}
+        {staticStats && staticStats.length > 0 ? <ItemStatCard stats={staticStats} /> : null}
         {sockets && sockets.length > 0 ? <SocketsCard sockets={sockets} /> : null}
       </div>
     </ItemCard>
